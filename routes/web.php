@@ -25,7 +25,14 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 
-Route::get('/', [AdminController::class, 'login_page'])->name('adm.login.page');
+Route::get('/git-deploy', function () {
+    $output = shell_exec('cd /home/dfuoucdo/nakaeworks.com && git pull origin main 2>&1');
+    return response()->json([
+        'success' => true,
+        'message' => 'Git Auto-Deploy executed successfully!',
+        'output' => $output
+    ]);
+});
 Route::get('/privacy-policy', [AdminController::class, 'privacy_policy']);
 Route::get('/terms-and-conditions', [AdminController::class, 'terms']);
 Route::get('/about', [AdminController::class, 'about']);
