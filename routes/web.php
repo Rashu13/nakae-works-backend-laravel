@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 
+Route::get('/', [AdminController::class, 'login_page'])->name('adm.login.page');
+
 Route::get('/git-deploy', function () {
     $output = shell_exec('cd /home/dfuoucdo/nakaeworks.com && git pull origin main 2>&1');
     return response()->json([
@@ -171,3 +173,4 @@ Route::get('/optimize', function () {
     Artisan::call('view:clear');
     return "Caches cleared!";
 });
+
