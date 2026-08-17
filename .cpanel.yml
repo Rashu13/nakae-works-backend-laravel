@@ -3,3 +3,5 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/dfuoucdo/nakaeworks.com
     - /bin/cp -R * $DEPLOYPATH
+    - /bin/cp -R .htaccess $DEPLOYPATH/ 2>/dev/null || true
+    - /bin/cp -R public/.htaccess $DEPLOYPATH/public/ 2>/dev/null || true
