@@ -32,6 +32,13 @@ Route::get('/git-deploy', function () {
         'message' => 'Git Auto-Deploy executed successfully!',
         'output' => $output
     ]);
+Route::get('/run-migrations', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return response()->json([
+        'success' => true,
+        'message' => 'Database Migrations executed successfully on live server!',
+        'output' => Artisan::output()
+    ]);
 });
 Route::get('/privacy-policy', [AdminController::class, 'privacy_policy']);
 Route::get('/terms-and-conditions', [AdminController::class, 'terms']);
