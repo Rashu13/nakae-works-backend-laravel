@@ -13,7 +13,7 @@ class ServiceRequestsController extends Controller
     public function serviceRequests()
     {
         $serviceRequests = ServiceRequestModel::with(['user', 'vendor', 'category', 'subCategory'])->latest()->get();
-        $vendors = VendorModel::where('status', 1)->orderBy('name', 'ASC')->get();
+        $vendors = VendorModel::with('city')->orderBy('name', 'ASC')->get();
 
         return view('serviceRequests', compact('serviceRequests', 'vendors'));
     }
@@ -34,7 +34,7 @@ class ServiceRequestsController extends Controller
             'messages.admin'
         ])->findOrFail($id);
 
-        $vendors = VendorModel::where('status', 1)->orderBy('name', 'ASC')->get();
+        $vendors = VendorModel::with('city')->orderBy('name', 'ASC')->get();
 
         return view('serviceView', compact('req', 'vendors'));
     }

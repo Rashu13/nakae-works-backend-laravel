@@ -258,11 +258,13 @@
                                                                 <label class="form-label fw-bold small mb-1" style="font-size: 0.72rem;">Select New Vendor Partner <span class="text-danger">*</span></label>
                                                                 <select name="vendor_id" class="form-select form-select-sm" required>
                                                                     <option value="">-- Choose New Vendor --</option>
-                                                                    @foreach($vendors as $v)
-                                                                        <option value="{{ $v->id }}" {{ ($request->vendor_id == $v->id) ? 'disabled' : '' }}>
-                                                                            {{ $v->name }} (📞 {{ $v->phone }}) {{ $v->city ? ' - ' . $v->city->name : '' }} {{ ($request->vendor_id == $v->id) ? '[Current]' : '' }}
+                                                                    @forelse($vendors as $v)
+                                                                        <option value="{{ $v->id }}">
+                                                                            {{ $v->name }} (📞 {{ $v->phone }}) {{ $v->city ? ' - ' . $v->city->name : '' }} {{ ($request->vendor_id == $v->id) ? ' [Current Partner]' : '' }}
                                                                         </option>
-                                                                    @endforeach
+                                                                    @empty
+                                                                        <option value="" disabled>No vendors found in system</option>
+                                                                    @endforelse
                                                                 </select>
                                                             </div>
 
