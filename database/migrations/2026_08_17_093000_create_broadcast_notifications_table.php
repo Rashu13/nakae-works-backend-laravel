@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('broadcast_notifications', function (Blueprint $table) {
-            $table->id();
-            $table->enum('target_audience', ['all_customers', 'all_vendors', 'specific_city'])->default('all_customers');
-            $table->unsignedBigInteger('city_id')->nullable();
-            $table->string('title');
-            $table->text('message');
-            $table->string('image')->nullable();
-            $table->integer('sent_count')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('broadcast_notifications')) {
+            Schema::create('broadcast_notifications', function (Blueprint $table) {
+                $table->id();
+                $table->enum('target_audience', ['all_customers', 'all_vendors', 'specific_city'])->default('all_customers');
+                $table->unsignedBigInteger('city_id')->nullable();
+                $table->string('title');
+                $table->text('message');
+                $table->string('image')->nullable();
+                $table->integer('sent_count')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

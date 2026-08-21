@@ -11,20 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('coupons', function (Blueprint $table) {
-            $table->id();
-            $table->string('coupon_code')->unique();
-            $table->enum('discount_type', ['percentage', 'fixed'])->default('fixed');
-            $table->decimal('discount_value', 10, 2);
-            $table->decimal('max_discount_amount', 10, 2)->nullable();
-            $table->decimal('min_booking_amount', 10, 2)->default(0.00);
-            $table->integer('total_usage_limit')->default(100);
-            $table->integer('used_count')->default(0);
-            $table->date('start_date')->nullable();
-            $table->date('expiry_date')->nullable();
-            $table->tinyInteger('status')->default(1);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('coupons')) {
+            Schema::create('coupons', function (Blueprint $table) {
+                $table->id();
+                $table->string('coupon_code')->unique();
+                $table->enum('discount_type', ['percentage', 'fixed'])->default('fixed');
+                $table->decimal('discount_value', 10, 2);
+                $table->decimal('max_discount_amount', 10, 2)->nullable();
+                $table->decimal('min_booking_amount', 10, 2)->default(0.00);
+                $table->integer('total_usage_limit')->default(100);
+                $table->integer('used_count')->default(0);
+                $table->date('start_date')->nullable();
+                $table->date('expiry_date')->nullable();
+                $table->tinyInteger('status')->default(1);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vendor_promotions', function (Blueprint $table) {
+        if (!Schema::hasTable('vendor_promotions')) {
+            Schema::create('vendor_promotions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('vendor_id');
             $table->unsignedBigInteger('sub_category_id')->nullable();
@@ -26,7 +27,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('vendor_id')->references('id')->on('vendors')->onDelete('cascade');
-        });
+            });
+        }
     }
 
     /**
