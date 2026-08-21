@@ -83,7 +83,9 @@ class CityController extends Controller
     public function cityByState($state_id)
     {
         $cities = CityModel::where('state_id', $state_id)
-            ->where('status', 1)
+            ->where(function($q) {
+                $q->where('status', 1)->orWhere('status', '1')->orWhereNull('status');
+            })
             ->orderBy('city_name')
             ->get([
                 'id',

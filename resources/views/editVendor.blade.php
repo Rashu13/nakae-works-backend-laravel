@@ -698,9 +698,9 @@
             $('#city_id').html('<option value="">Loading...</option>');
 
             if (state_id) {
-                $.get('/admin/city-by-state/' + state_id, function(res) {
+                $.get("{{ url('/admin/city-by-state') }}/" + state_id, function(res) {
                     $('#city_id').html('<option value="">Select City</option>');
-                    if (res.success) {
+                    if (res.success && res.data) {
                         $.each(res.data, function(i, row) {
                             let isSelected = (row.id == selectedCityId) ? 'selected' : '';
                             $('#city_id').append(
@@ -708,6 +708,9 @@
                             );
                         });
                     }
+                }).fail(function(xhr) {
+                    console.error('Failed to load cities for state ' + state_id, xhr);
+                    $('#city_id').html('<option value="">Select City</option>');
                 });
             } else {
                 $('#city_id').html('<option value="">Select City</option>');

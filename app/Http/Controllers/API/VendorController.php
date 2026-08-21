@@ -91,7 +91,7 @@ class VendorController extends Controller
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'in_hash' => base64_encode(base64_encode($request->password)),
-            'status' => 0,
+            'status' => 'pending',
             'is_verified' => 0,
             'profile_completed' => 0,
         ]);

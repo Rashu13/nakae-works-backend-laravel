@@ -28,6 +28,11 @@ class BroadcastNotificationController extends Controller
         return view('broadcastNotifications', compact('broadcasts', 'cities', 'totalBroadcastsSent', 'totalNotificationsDelivered'));
     }
 
+    public function sendBroadcast(Request $request)
+    {
+        return $this->send($request);
+    }
+
     public function send(Request $request)
     {
         $request->validate([

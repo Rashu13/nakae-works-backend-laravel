@@ -686,29 +686,26 @@
     }
 
     $('#state_id').change(function() {
-
         let state_id = $(this).val();
-
         $('#city_id').html('<option value="">Loading...</option>');
 
-        $.get('/admin/city-by-state/' + state_id, function(res) {
-
+        if (state_id) {
+            $.get("{{ url('/admin/city-by-state') }}/" + state_id, function(res) {
+                $('#city_id').html('<option value="">Select City</option>');
+                if (res.success && res.data) {
+                    $.each(res.data, function(i, row) {
+                        $('#city_id').append(
+                            `<option value="${row.id}">${row.city_name}</option>`
+                        );
+                    });
+                }
+            }).fail(function(xhr) {
+                console.error('Failed to load cities', xhr);
+                $('#city_id').html('<option value="">Select City</option>');
+            });
+        } else {
             $('#city_id').html('<option value="">Select City</option>');
-
-            if (res.success) {
-
-                $.each(res.data, function(i, row) {
-
-                    $('#city_id').append(
-                        `<option value="${row.id}">${row.city_name}</option>`
-                    );
-
-                });
-
-            }
-
-        });
-
+        }
     });
 </script>
 @endsection

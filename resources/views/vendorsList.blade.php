@@ -190,22 +190,17 @@
 
                                     <!-- Status -->
                                     <td class="text-center">
-                                        @switch($vendor->status)
-                                            @case('approved')
-                                                <span class="badge-status-sm bg-success text-white">Approved</span>
-                                                @break
-                                            @case('pending')
-                                                <span class="badge-status-sm bg-warning text-dark">Pending</span>
-                                                @break
-                                            @case('rejected')
-                                                <span class="badge-status-sm bg-danger text-white">Rejected</span>
-                                                @break
-                                            @case('blocked')
-                                                <span class="badge-status-sm bg-dark text-white">Blocked</span>
-                                                @break
-                                            @default
-                                                <span class="badge-status-sm bg-secondary text-white">{{ ucfirst($vendor->status) }}</span>
-                                        @endswitch
+                                        @if($vendor->status === 'approved' || $vendor->status == 1 || $vendor->status === '1')
+                                            <span class="badge-status-sm bg-success text-white">Approved</span>
+                                        @elseif($vendor->status === 'pending' || $vendor->status == 0 || $vendor->status === '0' || empty($vendor->status))
+                                            <span class="badge-status-sm bg-warning text-dark">Pending</span>
+                                        @elseif($vendor->status === 'rejected')
+                                            <span class="badge-status-sm bg-danger text-white">Rejected</span>
+                                        @elseif($vendor->status === 'blocked')
+                                            <span class="badge-status-sm bg-dark text-white">Blocked</span>
+                                        @else
+                                            <span class="badge-status-sm bg-secondary text-white">{{ ucfirst($vendor->status) }}</span>
+                                        @endif
                                     </td>
 
                                     <!-- Actions -->
