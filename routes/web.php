@@ -100,6 +100,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
 
 
     Route::get('/user-list', [AdminUserController::class, 'userList'])->name('user.list');
+    Route::get('/users-list', [AdminUserController::class, 'userList'])->name('users.list');
     Route::get('/user-view/{id}', [AdminUserController::class, 'userView'])->name('user.view');
     Route::get('/user-edit/{id}', [AdminUserController::class, 'userEditPage'])->name('user.edit.page');
     Route::put('/user-update-post/{id}', [AdminUserController::class, 'userEditPost'])->name('user.update');

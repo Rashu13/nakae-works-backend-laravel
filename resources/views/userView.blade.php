@@ -106,7 +106,7 @@
                         <a href="{{ route('admin.user.edit.page', $user->id) }}" class="btn btn-light btn-sm rounded-pill px-3 py-1 fw-bold text-indigo" style="color: #4338ca; font-size: 0.75rem;">
                             <i class="mdi mdi-pencil me-1"></i> Edit User
                         </a>
-                        <a href="{{ route('admin.users.list') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 fw-bold" style="font-size: 0.75rem;">
+                        <a href="{{ route('admin.user.list') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 fw-bold" style="font-size: 0.75rem;">
                             <i class="mdi mdi-arrow-left me-1"></i> Back
                         </a>
                     </div>
