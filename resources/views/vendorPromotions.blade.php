@@ -489,61 +489,130 @@
                                     </div>
                                 </div>
 
-                                <!-- Offer / Discount / Coupon Setting Box -->
-                                <div class="row g-2 mb-3 p-2 rounded-3" style="background-color: #f0fdf4; border: 1px dashed #86efac;">
-                                    <div class="col-12">
-                                        <label class="info-label-sm fw-bold text-success mb-1" style="font-size: 0.75rem;">
-                                            <i class="mdi mdi-tag-percent me-1"></i> Offer, Discount & Auto Coupon Settings (Optional)
+                                <!-- Offer / Discount & Pricing Settings Box -->
+                                <div class="p-3 mb-3 rounded-3" style="background-color: #f0fdf4; border: 1.5px dashed #86efac;">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="info-label-sm fw-bold text-success mb-0" style="font-size: 0.8rem;">
+                                            <i class="mdi mdi-tag-percent me-1"></i> Offer, Discount & Pricing Rules
                                         </label>
+                                        <span class="badge bg-success-subtle text-success px-2 py-1" style="font-size: 0.68rem;">Customer Special Deal</span>
                                     </div>
-                                    <!-- Offer Badge -->
-                                    <div class="col-12 col-md-4">
-                                        <label class="info-label-sm">Offer Badge Tag</label>
-                                        <input type="text" name="offer_badge" class="form-control form-control-sm" placeholder="e.g. 20% OFF / Summer Deal" value="{{ old('offer_badge') }}">
+
+                                    <div class="row g-2">
+                                        <!-- Discount Type -->
+                                        <div class="col-6 col-md-3">
+                                            <label class="info-label-sm">Discount Type</label>
+                                            <select name="discount_type" id="promoDiscountType" class="form-select form-select-sm">
+                                                <option value="percent" selected>Percentage (%)</option>
+                                                <option value="flat">Flat Amount (₹)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Discount Value -->
+                                        <div class="col-6 col-md-3">
+                                            <label class="info-label-sm">Discount Value <span class="text-danger">*</span></label>
+                                            <input type="number" step="0.01" min="0" name="discount_percent" id="promoDiscountValue" class="form-control form-control-sm" placeholder="e.g. 20" value="{{ old('discount_percent', '20') }}">
+                                        </div>
+
+                                        <!-- Original Price -->
+                                        <div class="col-6 col-md-3">
+                                            <label class="info-label-sm">Original Price (₹)</label>
+                                            <input type="number" step="0.01" min="0" name="original_price" id="promoOriginalPrice" class="form-control form-control-sm" placeholder="e.g. 499" value="{{ old('original_price', '499.00') }}">
+                                        </div>
+
+                                        <!-- Offer Deal Price -->
+                                        <div class="col-6 col-md-3">
+                                            <label class="info-label-sm">Offer Price (₹)</label>
+                                            <input type="number" step="0.01" min="0" name="offer_price" id="promoOfferPrice" class="form-control form-control-sm fw-bold text-success" placeholder="e.g. 399" value="{{ old('offer_price', '399.00') }}">
+                                        </div>
+
+                                        <!-- Offer Badge -->
+                                        <div class="col-12 col-md-4">
+                                            <label class="info-label-sm">Offer Badge Tag</label>
+                                            <input type="text" name="offer_badge" class="form-control form-control-sm" placeholder="e.g. 20% OFF / Festive Deal" value="{{ old('offer_badge', '20% OFF') }}">
+                                        </div>
+
+                                        <!-- Auto Coupon Code -->
+                                        <div class="col-12 col-md-4">
+                                            <label class="info-label-sm">Auto Coupon Code</label>
+                                            <input type="text" name="coupon_code" class="form-control form-control-sm text-uppercase fw-bold text-success" placeholder="e.g. OFFER20" value="{{ old('coupon_code') }}">
+                                        </div>
+
+                                        <!-- Min Order Amount -->
+                                        <div class="col-12 col-md-4">
+                                            <label class="info-label-sm">Min. Order Amount (₹)</label>
+                                            <input type="number" step="0.01" min="0" name="min_order_amount" class="form-control form-control-sm" placeholder="0.00" value="{{ old('min_order_amount', '0.00') }}">
+                                        </div>
                                     </div>
-                                    <!-- Discount Value -->
-                                    <div class="col-6 col-md-4">
-                                        <label class="info-label-sm">Discount Percent (%)</label>
-                                        <input type="number" min="0" max="100" name="discount_percent" class="form-control form-control-sm" placeholder="e.g. 20" value="{{ old('discount_percent', '0') }}">
+                                </div>
+
+                                <!-- Usage Limits & Validity Box -->
+                                <div class="p-3 mb-3 rounded-3" style="background-color: #f8fafc; border: 1.5px dashed #cbd5e1;">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="info-label-sm fw-bold text-dark mb-0" style="font-size: 0.8rem;">
+                                            <i class="mdi mdi-account-clock-outline me-1 text-primary"></i> Customer Usage Limits & Validity
+                                        </label>
+                                        <span class="badge bg-primary-subtle text-primary px-2 py-1" style="font-size: 0.68rem;">Frequency Rules</span>
                                     </div>
-                                    <!-- Coupon Code -->
-                                    <div class="col-6 col-md-4">
-                                        <label class="info-label-sm">Auto Coupon Code</label>
-                                        <input type="text" name="coupon_code" class="form-control form-control-sm text-uppercase fw-bold text-success" placeholder="e.g. OFFER20" value="{{ old('coupon_code') }}">
+
+                                    <div class="row g-2">
+                                        <!-- Max Uses Per User -->
+                                        <div class="col-6 col-md-3">
+                                            <label class="info-label-sm">Max Use Per User</label>
+                                            <select name="max_uses_per_user" class="form-select form-select-sm">
+                                                <option value="1" selected>1 Time Per Customer</option>
+                                                <option value="2">2 Times Per Customer</option>
+                                                <option value="3">3 Times Per Customer</option>
+                                                <option value="5">5 Times Per Customer</option>
+                                                <option value="0">Unlimited Uses</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Total Redemption Limit -->
+                                        <div class="col-6 col-md-3">
+                                            <label class="info-label-sm">Total Bookings Limit</label>
+                                            <input type="number" min="1" name="total_usage_limit" class="form-control form-control-sm" placeholder="e.g. First 100 users" value="{{ old('total_usage_limit') }}">
+                                        </div>
+
+                                        <!-- Validity Start Date -->
+                                        <div class="col-6 col-md-3">
+                                            <label class="info-label-sm">
+                                                Start Date <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="date" name="start_date" class="form-control form-control-sm" value="{{ old('start_date', now()->toDateString()) }}" required>
+                                        </div>
+
+                                        <!-- Validity End Date -->
+                                        <div class="col-6 col-md-3">
+                                            <label class="info-label-sm">
+                                                End Date <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="date" name="end_date" class="form-control form-control-sm" value="{{ old('end_date', now()->addDays(30)->toDateString()) }}" required>
+                                        </div>
+
+                                        <!-- Terms & Notes -->
+                                        <div class="col-12">
+                                            <label class="info-label-sm">Terms & Conditions / Offer Note (Optional)</label>
+                                            <input type="text" name="terms_note" class="form-control form-control-sm" placeholder="e.g. Applicable only on AC Service bookings in Sirsa district..." value="{{ old('terms_note') }}">
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="row g-2">
-                                    <!-- Validity Start Date -->
-                                    <div class="col-6 col-md-3">
-                                        <label class="info-label-sm">
-                                            Start Date <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="date" name="start_date" class="form-control" value="{{ old('start_date', now()->toDateString()) }}" required>
-                                    </div>
-
-                                    <!-- Validity End Date -->
-                                    <div class="col-6 col-md-3">
-                                        <label class="info-label-sm">
-                                            End Date <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="date" name="end_date" class="form-control" value="{{ old('end_date', now()->addDays(30)->toDateString()) }}" required>
-                                    </div>
-
                                     <!-- Ad Fee / Price -->
-                                    <div class="col-6 col-md-3">
+                                    <div class="col-6 col-md-6">
                                         <label class="info-label-sm">
-                                            Ad Price / Charge (₹) <span class="text-danger">*</span>
+                                            Ad Price / Vendor Promotion Charge (₹) <span class="text-danger">*</span>
                                         </label>
-                                        <input type="number" step="0.01" min="0" name="price" class="form-control" value="{{ old('price', '999.00') }}" placeholder="999.00" required>
+                                        <input type="number" step="0.01" min="0" name="price" class="form-control form-control-sm" value="{{ old('price', '999.00') }}" placeholder="999.00" required>
                                     </div>
 
                                     <!-- Status -->
-                                    <div class="col-6 col-md-3">
+                                    <div class="col-6 col-md-6">
                                         <label class="info-label-sm">Status</label>
-                                        <select name="status" class="form-select">
-                                            <option value="1" selected>Active</option>
-                                            <option value="0">Inactive</option>
+                                        <select name="status" class="form-select form-select-sm">
+                                            <option value="1" selected>Active (Live in App)</option>
+                                            <option value="0">Inactive / Paused</option>
                                         </select>
                                     </div>
                                 </div>
@@ -564,12 +633,39 @@
     </div>
 </div>
 
-@if($errors->any())
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        var addModal = new bootstrap.Modal(document.getElementById('addPromotionModal'));
-        addModal.show();
+        @if($errors->any())
+            var addModal = new bootstrap.Modal(document.getElementById('addPromotionModal'));
+            addModal.show();
+        @endif
+
+        const origInput = document.getElementById('promoOriginalPrice');
+        const discType = document.getElementById('promoDiscountType');
+        const discVal = document.getElementById('promoDiscountValue');
+        const offerInput = document.getElementById('promoOfferPrice');
+
+        function calculateOffer() {
+            if (!origInput || !discVal || !offerInput) return;
+            const orig = parseFloat(origInput.value) || 0;
+            const type = discType ? discType.value : 'percent';
+            const val = parseFloat(discVal.value) || 0;
+            
+            let offer = orig;
+            if (type === 'percent') {
+                offer = orig - (orig * (val / 100));
+            } else {
+                offer = orig - val;
+            }
+            if (offer < 0) offer = 0;
+            offerInput.value = offer.toFixed(2);
+        }
+
+        if (origInput && discVal && discType) {
+            origInput.addEventListener('input', calculateOffer);
+            discVal.addEventListener('input', calculateOffer);
+            discType.addEventListener('change', calculateOffer);
+        }
     });
 </script>
-@endif
 @endsection
