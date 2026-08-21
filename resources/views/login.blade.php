@@ -176,7 +176,7 @@
                                            id="email"
                                            name="email"
                                            value="{{ old('email') }}"
-                                           placeholder="admin@kinolex.com"
+                                           placeholder="admin@nakaeworks.com"
                                            required autofocus>
                                 </div>
                                 @error('email')
