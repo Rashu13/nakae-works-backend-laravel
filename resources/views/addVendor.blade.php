@@ -502,11 +502,21 @@
 
                                 {{-- Vendor Services --}}
                                 <div class="col-12 mt-4">
-                                    <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <h5 class="text-primary mb-0">
-                                            <i class="mdi mdi-tools me-1"></i> Vendor Services
-                                        </h5>
-                                        <span class="text-muted small">Select the categories and individual services this vendor provides</span>
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2 p-2 bg-light rounded-3 border">
+                                        <div>
+                                            <h5 class="text-primary mb-0 fw-bold">
+                                                <i class="mdi mdi-tools me-1"></i> Vendor Services
+                                            </h5>
+                                            <span class="text-muted small">Select the categories and individual services this vendor provides</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-bold" onclick="selectAllServicesEverywhere(true)" style="font-size: 0.75rem;">
+                                                <i class="mdi mdi-check-all me-1"></i> Select All Everywhere
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold" onclick="selectAllServicesEverywhere(false)" style="font-size: 0.75rem;">
+                                                <i class="mdi mdi-close me-1"></i> Clear All
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -514,17 +524,30 @@
                                 <div class="col-md-12 mb-3">
                                     <div class="service-card shadow-sm border rounded-3 overflow-hidden">
                                         <div class="card border-0">
-                                            <div class="card-header bg-light d-flex align-items-center justify-content-between py-2 px-3">
-                                                <label class="fw-bold mb-0 text-dark d-flex align-items-center gap-2 cursor-pointer">
+                                            <div class="card-header bg-light d-flex align-items-center justify-content-between flex-wrap gap-2 py-2 px-3">
+                                                <div class="d-flex align-items-center gap-2">
                                                     <input type="checkbox"
+                                                           id="add_cat_check_{{ $category->id }}"
                                                            class="category-checkbox form-check-input mt-0"
-                                                           data-target="cat{{ $category->id }}">
-                                                    <span>{{ $category->category_name }}</span>
+                                                           data-target="cat{{ $category->id }}"
+                                                           onchange="toggleCategoryServices(this, 'cat{{ $category->id }}')"
+                                                           style="width: 18px; height: 18px; cursor: pointer;">
+                                                    <label for="add_cat_check_{{ $category->id }}" class="fw-bold mb-0 text-dark" style="cursor: pointer; font-size: 0.9rem;">
+                                                        {{ $category->category_name }}
+                                                    </label>
                                                     <span class="badge bg-secondary-subtle text-secondary border rounded-pill px-2 py-0" style="font-size: 0.7rem;">
                                                         {{ $category->subCategories->count() }} Services
                                                     </span>
-                                                </label>
-                                                <span class="text-muted small" style="font-size: 0.72rem;">Click checkbox to select/deselect all</span>
+                                                </div>
+
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <button type="button" class="btn btn-xs btn-outline-primary py-0 px-2 rounded-pill fw-semibold" style="font-size: 0.7rem;" onclick="selectAllInCategory('cat{{ $category->id }}', true)">
+                                                        Select All
+                                                    </button>
+                                                    <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2 rounded-pill fw-semibold" style="font-size: 0.7rem;" onclick="selectAllInCategory('cat{{ $category->id }}', false)">
+                                                        Clear
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <div class="card-body p-3">
@@ -537,8 +560,10 @@
                                                                    id="service_{{ $sub->id }}"
                                                                    class="service-item-checkbox form-check-input mt-0"
                                                                    data-category="cat{{ $category->id }}"
-                                                                   value="{{ $category->id.'|'.$sub->id }}">
-                                                            <label for="service_{{ $sub->id }}" class="mb-0 text-dark small fw-medium cursor-pointer flex-grow-1" style="font-size: 0.8rem;">
+                                                                   onchange="checkServiceItem(this)"
+                                                                   value="{{ $category->id.'|'.$sub->id }}"
+                                                                   style="width: 16px; height: 16px; cursor: pointer;">
+                                                            <label for="service_{{ $sub->id }}" class="mb-0 text-dark small fw-medium flex-grow-1" style="font-size: 0.8rem; cursor: pointer;">
                                                                 {{ $sub->sub_category_name }}
                                                             </label>
                                                         </div>
@@ -610,19 +635,56 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
-    // Check/Uncheck all services in category
-    $('.category-checkbox').change(function() {
-        let targetClass = $(this).data('target');
-        $('.' + targetClass).find('.service-item-checkbox').prop('checked', this.checked);
-    });
+    // Pure Vanilla JS Functions (Fail-safe, instant execution)
+    function toggleCategoryServices(checkbox, targetClass) {
+        var isChecked = checkbox.checked;
+        var container = document.querySelector('.' + targetClass);
+        if (container) {
+            var checkboxes = container.querySelectorAll('.service-item-checkbox');
+            checkboxes.forEach(function(cb) {
+                cb.checked = isChecked;
+            });
+        }
+    }
 
-    // Update category checkbox state based on child service checkboxes
-    $('.service-item-checkbox').change(function() {
-        let catClass = $(this).data('category');
-        let total = $('.' + catClass).find('.service-item-checkbox').length;
-        let checked = $('.' + catClass).find('.service-item-checkbox:checked').length;
-        $('[data-target="' + catClass + '"]').prop('checked', total > 0 && checked === total);
-    });
+    function selectAllInCategory(targetClass, check) {
+        var container = document.querySelector('.' + targetClass);
+        if (container) {
+            var checkboxes = container.querySelectorAll('.service-item-checkbox');
+            checkboxes.forEach(function(cb) {
+                cb.checked = check;
+            });
+        }
+        var masterCb = document.querySelector('[data-target="' + targetClass + '"]');
+        if (masterCb) {
+            masterCb.checked = check;
+        }
+    }
+
+    function selectAllServicesEverywhere(check) {
+        document.querySelectorAll('.service-item-checkbox').forEach(function(cb) {
+            cb.checked = check;
+        });
+        document.querySelectorAll('.category-checkbox').forEach(function(cb) {
+            cb.checked = check;
+        });
+    }
+
+    function checkServiceItem(serviceCheckbox) {
+        var catClass = serviceCheckbox.getAttribute('data-category');
+        if (catClass) {
+            var container = document.querySelector('.' + catClass);
+            if (container) {
+                var all = container.querySelectorAll('.service-item-checkbox');
+                var checked = container.querySelectorAll('.service-item-checkbox:checked');
+                var masterCb = document.querySelector('[data-target="' + catClass + '"]');
+                if (masterCb) {
+                    masterCb.checked = (all.length > 0 && checked.length === all.length);
+                }
+            }
+        }
+    }
+
     $('#state_id').change(function() {
 
         let state_id = $(this).val();
