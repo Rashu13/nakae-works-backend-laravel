@@ -100,7 +100,7 @@ class VendorPromotionController extends Controller
 
         $request->validate([
             'vendor_id'    => 'required|exists:vendors,id',
-            'placement'    => 'required|in:home_banner,category_top,city_featured',
+            'placement'    => 'required|in:home_banner,flash_deals,top_rated,trending,category_top,city_featured',
             'start_date'   => 'required|date',
             'end_date'     => 'required|date|after_or_equal:start_date',
             'price'        => 'required|numeric|min:0',

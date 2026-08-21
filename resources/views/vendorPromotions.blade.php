@@ -214,9 +214,12 @@
                         <div class="col-6 col-md-3">
                             <select name="placement" class="form-select" onchange="this.form.submit()">
                                 <option value="">All Ad Placements</option>
-                                <option value="home_banner" {{ request('placement') === 'home_banner' ? 'selected' : '' }}>Home Top Banner Slider</option>
-                                <option value="category_top" {{ request('placement') === 'category_top' ? 'selected' : '' }}>Category Top Sponsored</option>
-                                <option value="city_featured" {{ request('placement') === 'city_featured' ? 'selected' : '' }}>City Featured Vendor</option>
+                                <option value="home_banner" {{ request('placement') === 'home_banner' ? 'selected' : '' }}>1. Home Top Banner Slider</option>
+                                <option value="flash_deals" {{ request('placement') === 'flash_deals' ? 'selected' : '' }}>2. ⚡ Flash Deals Section</option>
+                                <option value="top_rated" {{ request('placement') === 'top_rated' ? 'selected' : '' }}>3. ⭐ Highly Rated Specialists</option>
+                                <option value="trending" {{ request('placement') === 'trending' ? 'selected' : '' }}>4. 🔥 Trending Services</option>
+                                <option value="category_top" {{ request('placement') === 'category_top' ? 'selected' : '' }}>5. Category Top Sponsored</option>
+                                <option value="city_featured" {{ request('placement') === 'city_featured' ? 'selected' : '' }}>6. City Featured Vendor</option>
                             </select>
                         </div>
 
@@ -320,12 +323,24 @@
                                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-semibold" style="font-size: 0.7rem;">
                                                 <i class="mdi mdi-view-carousel me-1"></i> Home Top Banner
                                             </span>
-                                        @elseif($promo->placement == 'category_top')
+                                        @elseif($promo->placement == 'flash_deals')
                                             <span class="badge bg-warning-subtle text-dark border border-warning px-2 py-1 fw-semibold" style="font-size: 0.7rem;">
-                                                <i class="mdi mdi-star me-1"></i> Category Top
+                                                <i class="mdi mdi-flash me-1 text-warning"></i> ⚡ Flash Deals
+                                            </span>
+                                        @elseif($promo->placement == 'top_rated')
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-semibold" style="font-size: 0.7rem;">
+                                                <i class="mdi mdi-star me-1 text-warning"></i> ⭐ Top Rated Pros
+                                            </span>
+                                        @elseif($promo->placement == 'trending')
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-semibold" style="font-size: 0.7rem;">
+                                                <i class="mdi mdi-fire me-1 text-danger"></i> 🔥 Trending Services
+                                            </span>
+                                        @elseif($promo->placement == 'category_top')
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 fw-semibold" style="font-size: 0.7rem;">
+                                                <i class="mdi mdi-tag me-1"></i> Category Top
                                             </span>
                                         @else
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-semibold" style="font-size: 0.7rem;">
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 fw-semibold" style="font-size: 0.7rem;">
                                                 <i class="mdi mdi-city me-1"></i> City Featured
                                             </span>
                                         @endif
@@ -457,8 +472,11 @@
                                         </label>
                                         <select name="placement" class="form-select @error('placement') is-invalid @enderror" required>
                                             <option value="home_banner" {{ old('placement') == 'home_banner' ? 'selected' : '' }}>1. App Home Top Banner Slider</option>
-                                            <option value="category_top" {{ old('placement') == 'category_top' ? 'selected' : '' }}>2. Category Top Sponsored Position</option>
-                                            <option value="city_featured" {{ old('placement') == 'city_featured' ? 'selected' : '' }}>3. City Featured Vendor Badge</option>
+                                            <option value="flash_deals" {{ old('placement') == 'flash_deals' ? 'selected' : '' }}>2. ⚡ Today's Flash Deals & Special Offers</option>
+                                            <option value="top_rated" {{ old('placement') == 'top_rated' ? 'selected' : '' }}>3. ⭐ Highly Rated Specialists Section</option>
+                                            <option value="trending" {{ old('placement') == 'trending' ? 'selected' : '' }}>4. 🔥 Trending & Most Booked Services Section</option>
+                                            <option value="category_top" {{ old('placement') == 'category_top' ? 'selected' : '' }}>5. Category Top Sponsored Position</option>
+                                            <option value="city_featured" {{ old('placement') == 'city_featured' ? 'selected' : '' }}>6. City Featured Vendor Badge</option>
                                         </select>
                                     </div>
                                 </div>
