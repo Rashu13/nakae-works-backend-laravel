@@ -501,61 +501,58 @@
                                 </div>
 
                                 {{-- Vendor Services --}}
-
                                 <div class="col-12 mt-4">
-                                    <h5 class="text-primary">Vendor Services</h5>
-                                </div>
-
-                                @foreach($categories as $category)
-
-                                <div class="col-md-12 mb-3">
-                                    <div class="service-card">
-                                        <div class="card">
-
-                                            <div class="card-header bg-light">
-
-                                                <label class="fw-bold">
-
-                                                    <input type="checkbox"
-                                                        class="category-checkbox"
-                                                        data-target="cat{{ $category->id }}">
-
-                                                    {{ $category->category_name }}
-
-                                                </label>
-
-                                            </div>
-
-                                            <div class="card-body">
-
-                                                <div class="row cat{{ $category->id }}" style="display:none;">
-
-                                                    @foreach($category->subCategories as $sub)
-
-                                                    <div class="col-md-3 mb-2">
-
-                                                        <label>
-
-                                                            <input type="checkbox"
-                                                                name="services[]"
-                                                                value="{{ $category->id.'|'.$sub->id }}">
-
-                                                            {{ $sub->sub_category_name }}
-
-                                                        </label>
-
-                                                    </div>
-
-                                                    @endforeach
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <h5 class="text-primary mb-0">
+                                            <i class="mdi mdi-tools me-1"></i> Vendor Services
+                                        </h5>
+                                        <span class="text-muted small">Select the categories and individual services this vendor provides</span>
                                     </div>
                                 </div>
 
+                                @foreach($categories as $category)
+                                <div class="col-md-12 mb-3">
+                                    <div class="service-card shadow-sm border rounded-3 overflow-hidden">
+                                        <div class="card border-0">
+                                            <div class="card-header bg-light d-flex align-items-center justify-content-between py-2 px-3">
+                                                <label class="fw-bold mb-0 text-dark d-flex align-items-center gap-2 cursor-pointer">
+                                                    <input type="checkbox"
+                                                           class="category-checkbox form-check-input mt-0"
+                                                           data-target="cat{{ $category->id }}">
+                                                    <span>{{ $category->category_name }}</span>
+                                                    <span class="badge bg-secondary-subtle text-secondary border rounded-pill px-2 py-0" style="font-size: 0.7rem;">
+                                                        {{ $category->subCategories->count() }} Services
+                                                    </span>
+                                                </label>
+                                                <span class="text-muted small" style="font-size: 0.72rem;">Click checkbox to select/deselect all</span>
+                                            </div>
+
+                                            <div class="card-body p-3">
+                                                <div class="row cat{{ $category->id }}">
+                                                    @forelse($category->subCategories as $sub)
+                                                    <div class="col-md-4 col-lg-3 mb-2">
+                                                        <div class="p-2 border rounded-2 bg-white d-flex align-items-center gap-2 h-100 hover-shadow">
+                                                            <input type="checkbox"
+                                                                   name="services[]"
+                                                                   id="service_{{ $sub->id }}"
+                                                                   class="service-item-checkbox form-check-input mt-0"
+                                                                   data-category="cat{{ $category->id }}"
+                                                                   value="{{ $category->id.'|'.$sub->id }}">
+                                                            <label for="service_{{ $sub->id }}" class="mb-0 text-dark small fw-medium cursor-pointer flex-grow-1" style="font-size: 0.8rem;">
+                                                                {{ $sub->sub_category_name }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    @empty
+                                                    <div class="col-12 text-muted small py-2">
+                                                        No services added in this category yet.
+                                                    </div>
+                                                    @endforelse
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 @endforeach
 
                                 {{-- Status --}}
@@ -613,10 +610,18 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+    // Check/Uncheck all services in category
     $('.category-checkbox').change(function() {
+        let targetClass = $(this).data('target');
+        $('.' + targetClass).find('.service-item-checkbox').prop('checked', this.checked);
+    });
 
-        $('.' + $(this).data('target')).toggle(this.checked);
-
+    // Update category checkbox state based on child service checkboxes
+    $('.service-item-checkbox').change(function() {
+        let catClass = $(this).data('category');
+        let total = $('.' + catClass).find('.service-item-checkbox').length;
+        let checked = $('.' + catClass).find('.service-item-checkbox:checked').length;
+        $('[data-target="' + catClass + '"]').prop('checked', total > 0 && checked === total);
     });
     $('#state_id').change(function() {
 

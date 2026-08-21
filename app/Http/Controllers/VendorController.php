@@ -22,13 +22,12 @@ class VendorController extends Controller
     }
     public function vendorsAdd()
     {
-        $states = StateModel::where('status', 1)->orderBy('name')->get();
+        $states = StateModel::orderBy('name')->get();
 
-        $categories = CategoryModel::where('status', 1)
-            ->with(['subCategories' => function ($q) {
-                $q->where('status', 1);
+        $categories = CategoryModel::with(['subCategories' => function ($q) {
+                $q->orderBy('sub_category_name');
             }])
-            ->orderBy('sort_order')
+            ->orderBy('category_name')
             ->get();
 
         return view('addVendor', compact(
@@ -207,13 +206,12 @@ class VendorController extends Controller
     }
     public function editVendor($id)
     {
-        $states = StateModel::where('status', 1)->orderBy('name')->get();
+        $states = StateModel::orderBy('name')->get();
 
-        $categories = CategoryModel::where('status', 1)
-            ->with(['subCategories' => function ($q) {
-                $q->where('status', 1);
+        $categories = CategoryModel::with(['subCategories' => function ($q) {
+                $q->orderBy('sub_category_name');
             }])
-            ->orderBy('sort_order')
+            ->orderBy('category_name')
             ->get();
         $vendor = VendorModel::with(['services'])->findOrFail($id);
         return view('editVendor', compact('vendor', 'states', 'categories'));
