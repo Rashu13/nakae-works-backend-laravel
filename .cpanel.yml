@@ -1,7 +1,14 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/dfuoucdo/admin.nakaeworks.com
-    - /bin/cp -R * $DEPLOYPATH
+    - export DEPLOYPATH=/home/dfuoucdo/nakaeworks.com
+    - /bin/cp -R * $DEPLOYPATH/ 2>/dev/null || true
     - /bin/cp -R .htaccess $DEPLOYPATH/ 2>/dev/null || true
     - /bin/cp -R public/.htaccess $DEPLOYPATH/public/ 2>/dev/null || true
+    - export DEPLOYPATH2=/home/dfuoucdo/admin.nakaeworks.com
+    - /bin/cp -R * $DEPLOYPATH2/ 2>/dev/null || true
+    - /bin/cp -R .htaccess $DEPLOYPATH2/ 2>/dev/null || true
+    - /bin/cp -R public/.htaccess $DEPLOYPATH2/public/ 2>/dev/null || true
+    - export DEPLOYPATH3=/home/dfuoucdo/public_html
+    - /bin/cp -R * $DEPLOYPATH3/ 2>/dev/null || true
+
