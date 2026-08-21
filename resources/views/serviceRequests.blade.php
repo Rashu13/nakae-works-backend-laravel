@@ -177,25 +177,49 @@
 
                                     <!-- Status -->
                                     <td class="text-center">
-                                        @switch(strtolower($request->status))
-                                            @case('pending')
-                                                <span class="badge bg-warning text-dark px-2 py-0 rounded-pill" style="font-size: 0.68rem;">Pending</span>
-                                                @break
-                                            @case('accepted')
-                                                <span class="badge bg-info text-white px-2 py-0 rounded-pill" style="font-size: 0.68rem;">Accepted</span>
-                                                @break
-                                            @case('assigned')
-                                                <span class="badge bg-primary text-white px-2 py-0 rounded-pill" style="font-size: 0.68rem;">Assigned</span>
-                                                @break
-                                            @case('completed')
-                                                <span class="badge bg-success text-white px-2 py-0 rounded-pill" style="font-size: 0.68rem;">Completed</span>
-                                                @break
-                                            @case('cancelled')
-                                                <span class="badge bg-danger text-white px-2 py-0 rounded-pill" style="font-size: 0.68rem;">Cancelled</span>
-                                                @break
-                                            @default
-                                                <span class="badge bg-secondary text-white px-2 py-0 rounded-pill" style="font-size: 0.68rem;">{{ ucfirst($request->status) }}</span>
-                                        @endswitch
+                                        <button type="button" 
+                                                class="btn p-0 border-0 shadow-none d-inline-flex align-items-center gap-1"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#updateStatusModal{{ $request->id }}"
+                                                title="Click to change status">
+                                            @switch(strtolower($request->status))
+                                                @case('pending')
+                                                    <span class="badge bg-warning text-dark px-2 py-1 rounded-pill fw-bold" style="font-size: 0.68rem;">
+                                                        <i class="mdi mdi-clock-outline me-1"></i>Pending <i class="mdi mdi-pencil ms-1" style="font-size: 0.6rem;"></i>
+                                                    </span>
+                                                    @break
+                                                @case('accepted')
+                                                    <span class="badge bg-info text-white px-2 py-1 rounded-pill fw-bold" style="font-size: 0.68rem;">
+                                                        <i class="mdi mdi-check-circle-outline me-1"></i>Accepted <i class="mdi mdi-pencil ms-1" style="font-size: 0.6rem;"></i>
+                                                    </span>
+                                                    @break
+                                                @case('assigned')
+                                                    <span class="badge bg-primary text-white px-2 py-1 rounded-pill fw-bold" style="font-size: 0.68rem;">
+                                                        <i class="mdi mdi-account-check me-1"></i>Assigned <i class="mdi mdi-pencil ms-1" style="font-size: 0.6rem;"></i>
+                                                    </span>
+                                                    @break
+                                                @case('in progress')
+                                                @case('in_progress')
+                                                    <span class="badge bg-indigo text-white px-2 py-1 rounded-pill fw-bold" style="background: #6366f1; font-size: 0.68rem;">
+                                                        <i class="mdi mdi-progress-wrench me-1"></i>In Progress <i class="mdi mdi-pencil ms-1" style="font-size: 0.6rem;"></i>
+                                                    </span>
+                                                    @break
+                                                @case('completed')
+                                                    <span class="badge bg-success text-white px-2 py-1 rounded-pill fw-bold" style="font-size: 0.68rem;">
+                                                        <i class="mdi mdi-check-decagram me-1"></i>Completed <i class="mdi mdi-pencil ms-1" style="font-size: 0.6rem;"></i>
+                                                    </span>
+                                                    @break
+                                                @case('cancelled')
+                                                    <span class="badge bg-danger text-white px-2 py-1 rounded-pill fw-bold" style="font-size: 0.68rem;">
+                                                        <i class="mdi mdi-close-circle me-1"></i>Cancelled <i class="mdi mdi-pencil ms-1" style="font-size: 0.6rem;"></i>
+                                                    </span>
+                                                    @break
+                                                @default
+                                                    <span class="badge bg-secondary text-white px-2 py-1 rounded-pill fw-bold" style="font-size: 0.68rem;">
+                                                        {{ ucfirst($request->status) }} <i class="mdi mdi-pencil ms-1" style="font-size: 0.6rem;"></i>
+                                                    </span>
+                                            @endswitch
+                                        </button>
                                     </td>
 
                                     <!-- Created Date -->
@@ -206,6 +230,16 @@
                                     <!-- Actions -->
                                     <td class="text-center">
                                         <div class="d-inline-flex gap-1">
+                                            <!-- Change Status Button -->
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary p-0 d-inline-flex align-items-center justify-content-center"
+                                                    style="width: 26px; height: 26px;"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#updateStatusModal{{ $request->id }}"
+                                                    title="Change Booking Status">
+                                                <i class="mdi mdi-list-status" style="font-size: 0.85rem;"></i>
+                                            </button>
+
                                             <!-- Reassign Vendor Button -->
                                             <button type="button"
                                                     class="btn btn-sm btn-outline-warning p-0 d-inline-flex align-items-center justify-content-center"
@@ -225,7 +259,59 @@
                                             </a>
                                         </div>
 
-                                        <!-- MODAL FOR THIS REQUEST -->
+                                        <!-- DIRECT UPDATE STATUS MODAL -->
+                                        <div class="modal fade text-start" id="updateStatusModal{{ $request->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                                                    <div class="modal-header text-white p-3" style="border-top-left-radius: 16px; border-top-right-radius: 16px; background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%) !important;">
+                                                        <h6 class="modal-title fw-bold text-white mb-0" style="font-size: 0.9rem;">
+                                                            <i class="mdi mdi-list-status text-warning me-1"></i> Update Status
+                                                        </h6>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('admin.service.requests.update.status', $request->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body p-3">
+                                                            <div class="p-2 mb-3 bg-light rounded-3 border" style="font-size: 0.75rem;">
+                                                                <div class="d-flex justify-content-between mb-1">
+                                                                    <span class="text-muted">Request Code:</span>
+                                                                    <span class="fw-bold text-primary">{{ $request->request_code }}</span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between">
+                                                                    <span class="text-muted">Current Status:</span>
+                                                                    <span class="badge bg-secondary text-white">{{ ucfirst($request->status) }}</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold small mb-1" style="font-size: 0.75rem;">Select New Status <span class="text-danger">*</span></label>
+                                                                <select name="status" class="form-select form-select-sm" required>
+                                                                    <option value="Pending" {{ strtolower($request->status) == 'pending' ? 'selected' : '' }}>🟡 Pending (Awaiting Action)</option>
+                                                                    <option value="Accepted" {{ strtolower($request->status) == 'accepted' ? 'selected' : '' }}>🔵 Accepted (Confirmed)</option>
+                                                                    <option value="Assigned" {{ strtolower($request->status) == 'assigned' ? 'selected' : '' }}>🔷 Assigned (Partner Assigned)</option>
+                                                                    <option value="In Progress" {{ strtolower($request->status) == 'in progress' || strtolower($request->status) == 'in_progress' ? 'selected' : '' }}>🟣 In Progress (Work Ongoing)</option>
+                                                                    <option value="Completed" {{ strtolower($request->status) == 'completed' ? 'selected' : '' }}>🟢 Completed (Fulfilled)</option>
+                                                                    <option value="Cancelled" {{ strtolower($request->status) == 'cancelled' ? 'selected' : '' }}>🔴 Cancelled (Rejected / Cancelled)</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="mb-2">
+                                                                <label class="form-label fw-bold small mb-1" style="font-size: 0.75rem;">Admin Remarks (Optional)</label>
+                                                                <textarea name="note" rows="2" class="form-control form-control-sm" placeholder="e.g. Verified by admin / customer requested cancellation..."></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer bg-light p-2 px-3 border-top" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                                                            <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">
+                                                                <i class="mdi mdi-check-circle me-1"></i> Update Status
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- REASSIGN MODAL FOR THIS REQUEST -->
                                         <div class="modal fade text-start" id="reassignModal{{ $request->id }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
                                                 <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">

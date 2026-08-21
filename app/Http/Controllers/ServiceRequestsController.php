@@ -124,5 +124,73 @@ class ServiceRequestsController extends Controller
 
         return back()->with('success', "Service Request #{$serviceReq->request_code} successfully transferred to '{$newVendor->name}'!");
     }
+
+    /**
+     * Directly update Service Request Status from Admin Panel
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string',
+            'note'   => 'nullable|string|max:500'
+        ]);
+
+        $serviceReq = ServiceRequestModel::with(['vendor', 'user', 'subCategory'])->findOrFail($id);
+        $oldStatus = $serviceReq->status;
+        $newStatus = $request->status;
+
+        $serviceReq->status = $newStatus;
+        $serviceReq->save();
+
+        $noteText = $request->filled('note') ? " (Note: {$request->note})" : "";
+
+        // 1. Log in Communication / Messages History
+        RequestMessagesModel::create([
+            'request_id'  => $serviceReq->id,
+            'sender_type' => 'admin',
+            'sender_id'   => auth('admin')->id() ?? 1,
+            'message'     => "📌 Status changed from '{$oldStatus}' to '{$newStatus}' by Admin.{$noteText}",
+        ]);
+
+        // 2. Notify Customer
+        if ($serviceReq->user_id) {
+            NotificationsModel::create([
+                'user_type' => 'customer',
+                'user_id'   => $serviceReq->user_id,
+                'title'     => 'Booking Status Updated',
+                'message'   => "Your booking #{$serviceReq->request_code} status has been updated to: " . ucfirst($newStatus) . ".{$noteText}",
+                'is_read'   => 0,
+            ]);
+        }
+
+        // 3. Notify Vendor
+        if ($serviceReq->vendor_id) {
+            NotificationsModel::create([
+                'user_type' => 'vendor',
+                'user_id'   => $serviceReq->vendor_id,
+                'title'     => 'Booking Status Updated',
+                'message'   => "Booking #{$serviceReq->request_code} status has been updated to: " . ucfirst($newStatus) . " by Admin.{$noteText}",
+                'is_read'   => 0,
+            ]);
+        }
+
+        // 4. Send FCM Push if tokens exist
+        if ($serviceReq->vendor && class_exists(\App\Http\Controllers\BroadcastNotificationController::class)) {
+            $fcmToken = $serviceReq->vendor->device_token ?? $serviceReq->vendor->fcm_token;
+            if ($fcmToken) {
+                try {
+                    \App\Http\Controllers\BroadcastNotificationController::sendFcmPushNotification(
+                        [$fcmToken],
+                        'Booking Status: ' . ucfirst($newStatus),
+                        "Booking #{$serviceReq->request_code} is now {$newStatus}.",
+                        ['request_id' => $serviceReq->id, 'status' => $newStatus]
+                    );
+                } catch (\Exception $e) {}
+            }
+        }
+
+        return back()->with('success', "Service Request #{$serviceReq->request_code} status successfully updated to '{$newStatus}'!");
+    }
 }
+
 

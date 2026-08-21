@@ -87,10 +87,65 @@
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-warning btn-sm rounded-pill px-3 py-1 fw-bold text-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#directUpdateStatusModal" style="font-size: 0.75rem;">
+                            <i class="mdi mdi-list-status me-1"></i> Change Status
+                        </button>
                         <a href="{{ route('admin.service.requests') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 fw-bold" style="font-size: 0.75rem;">
                             <i class="mdi mdi-arrow-left me-1"></i> Back to Requests
                         </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIRECT UPDATE STATUS MODAL -->
+            <div class="modal fade" id="directUpdateStatusModal" tabindex="-1" aria-labelledby="directUpdateStatusModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                        <div class="modal-header text-white p-3" style="border-top-left-radius: 16px; border-top-right-radius: 16px; background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%) !important;">
+                            <h6 class="modal-title fw-bold text-white mb-0" id="directUpdateStatusModalLabel" style="font-size: 0.9rem;">
+                                <i class="mdi mdi-list-status text-warning me-1"></i> Update Status
+                            </h6>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="{{ route('admin.service.requests.update.status', $req->id) }}" method="POST">
+                            @csrf
+                            <div class="modal-body p-3">
+                                <div class="p-2 mb-3 bg-light rounded-3 border" style="font-size: 0.75rem;">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-muted">Request Code:</span>
+                                        <span class="fw-bold text-primary">{{ $req->request_code }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted">Current Status:</span>
+                                        <span class="badge bg-secondary text-white">{{ ucfirst($req->status) }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small mb-1" style="font-size: 0.75rem;">Select New Status <span class="text-danger">*</span></label>
+                                    <select name="status" class="form-select form-select-sm" required>
+                                        <option value="Pending" {{ strtolower($req->status) == 'pending' ? 'selected' : '' }}>🟡 Pending (Awaiting Action)</option>
+                                        <option value="Accepted" {{ strtolower($req->status) == 'accepted' ? 'selected' : '' }}>🔵 Accepted (Confirmed)</option>
+                                        <option value="Assigned" {{ strtolower($req->status) == 'assigned' ? 'selected' : '' }}>🔷 Assigned (Partner Assigned)</option>
+                                        <option value="In Progress" {{ strtolower($req->status) == 'in progress' || strtolower($req->status) == 'in_progress' ? 'selected' : '' }}>🟣 In Progress (Work Ongoing)</option>
+                                        <option value="Completed" {{ strtolower($req->status) == 'completed' ? 'selected' : '' }}>🟢 Completed (Fulfilled)</option>
+                                        <option value="Cancelled" {{ strtolower($req->status) == 'cancelled' ? 'selected' : '' }}>🔴 Cancelled (Rejected / Cancelled)</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold small mb-1" style="font-size: 0.75rem;">Admin Remarks (Optional)</label>
+                                    <textarea name="note" rows="2" class="form-control form-control-sm" placeholder="e.g. Verified by admin / customer requested cancellation..."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light p-2 px-3 border-top" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                                <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">
+                                    <i class="mdi mdi-check-circle me-1"></i> Update Status
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -117,6 +117,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::get('/service-requests', [ServiceRequestsController::class, 'serviceRequests'])->name('service.requests');
     Route::get('/service-request-view/{id}', [ServiceRequestsController::class, 'serviceRequestView'])->name('service.requests.view');
     Route::post('/service-request/reassign/{id}', [ServiceRequestsController::class, 'reassignVendor'])->name('service.requests.reassign');
+    Route::post('/service-request/update-status/{id}', [ServiceRequestsController::class, 'updateStatus'])->name('service.requests.update.status');
 
 
     Route::get('/banner', [BannerController::class, 'index'])->name('banner.index');
