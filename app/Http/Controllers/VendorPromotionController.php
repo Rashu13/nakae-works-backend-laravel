@@ -8,10 +8,60 @@ use App\Models\VendorModel;
 use App\Models\SubCategoryModel;
 use App\Models\CityModel;
 
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+
 class VendorPromotionController extends Controller
 {
+    private function ensureColumnsExist()
+    {
+        try {
+            if (Schema::hasTable('vendor_promotions')) {
+                Schema::table('vendor_promotions', function (Blueprint $table) {
+                    if (!Schema::hasColumn('vendor_promotions', 'coupon_code')) {
+                        $table->string('coupon_code', 50)->nullable()->after('placement');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'discount_type')) {
+                        $table->string('discount_type', 20)->default('percent')->after('coupon_code');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'discount_percent')) {
+                        $table->integer('discount_percent')->nullable()->default(0)->after('discount_type');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'discount_amount')) {
+                        $table->decimal('discount_amount', 10, 2)->nullable()->default(0.00)->after('discount_percent');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'original_price')) {
+                        $table->decimal('original_price', 10, 2)->nullable()->default(0.00)->after('discount_amount');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'offer_price')) {
+                        $table->decimal('offer_price', 10, 2)->nullable()->default(0.00)->after('original_price');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'offer_badge')) {
+                        $table->string('offer_badge', 100)->nullable()->after('offer_price');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'max_uses_per_user')) {
+                        $table->integer('max_uses_per_user')->default(1)->after('offer_badge');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'total_usage_limit')) {
+                        $table->integer('total_usage_limit')->nullable()->after('max_uses_per_user');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'min_order_amount')) {
+                        $table->decimal('min_order_amount', 10, 2)->default(0.00)->after('total_usage_limit');
+                    }
+                    if (!Schema::hasColumn('vendor_promotions', 'terms_note')) {
+                        $table->text('terms_note')->nullable()->after('min_order_amount');
+                    }
+                });
+            }
+        } catch (\Exception $e) {
+            // Log or ignore if DDL permissions are restricted
+        }
+    }
+
     public function index(Request $request)
     {
+        $this->ensureColumnsExist();
+
         $query = VendorPromotionModel::with(['vendor', 'subCategory', 'city']);
 
         if ($request->filled('placement')) {
@@ -46,6 +96,8 @@ class VendorPromotionController extends Controller
 
     public function store(Request $request)
     {
+        $this->ensureColumnsExist();
+
         $request->validate([
             'vendor_id'    => 'required|exists:vendors,id',
             'placement'    => 'required|in:home_banner,category_top,city_featured',
@@ -63,13 +115,21 @@ class VendorPromotionController extends Controller
             $imagePath = 'uploads/banner_images/' . $filename;
         }
 
-        VendorPromotionModel::create([
-            'vendor_id'         => $request->vendor_id,
-            'sub_category_id'   => $request->sub_category_id,
-            'city_id'           => $request->city_id,
-            'title'             => $request->title,
-            'banner_image'      => $imagePath,
-            'placement'         => $request->placement,
+        $insertData = [
+            'vendor_id'    => $request->vendor_id,
+            'sub_category_id' => $request->sub_category_id,
+            'city_id'      => $request->city_id,
+            'title'        => $request->title,
+            'banner_image' => $imagePath,
+            'placement'    => $request->placement,
+            'start_date'   => $request->start_date,
+            'end_date'     => $request->end_date,
+            'price'        => $request->price,
+            'status'       => $request->status ?? 1,
+        ];
+
+        // Safely add extended offer fields only if present in table
+        $extendedFields = [
             'coupon_code'       => $request->coupon_code ? strtoupper(trim($request->coupon_code)) : null,
             'discount_type'     => $request->discount_type ?? 'percent',
             'discount_percent'  => $request->discount_percent ?? 0,
@@ -81,11 +141,15 @@ class VendorPromotionController extends Controller
             'total_usage_limit' => $request->total_usage_limit,
             'min_order_amount'  => $request->min_order_amount ?? 0.00,
             'terms_note'        => $request->terms_note,
-            'start_date'        => $request->start_date,
-            'end_date'          => $request->end_date,
-            'price'             => $request->price,
-            'status'            => $request->status ?? 1,
-        ]);
+        ];
+
+        foreach ($extendedFields as $key => $val) {
+            if (Schema::hasColumn('vendor_promotions', $key)) {
+                $insertData[$key] = $val;
+            }
+        }
+
+        VendorPromotionModel::create($insertData);
 
         return redirect()->back()->with('success', 'Vendor Ad / Promoted Listing created successfully.');
     }
