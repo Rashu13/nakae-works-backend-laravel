@@ -489,6 +489,30 @@
                                     </div>
                                 </div>
 
+                                <!-- Offer / Discount / Coupon Setting Box -->
+                                <div class="row g-2 mb-3 p-2 rounded-3" style="background-color: #f0fdf4; border: 1px dashed #86efac;">
+                                    <div class="col-12">
+                                        <label class="info-label-sm fw-bold text-success mb-1" style="font-size: 0.75rem;">
+                                            <i class="mdi mdi-tag-percent me-1"></i> Offer, Discount & Auto Coupon Settings (Optional)
+                                        </label>
+                                    </div>
+                                    <!-- Offer Badge -->
+                                    <div class="col-12 col-md-4">
+                                        <label class="info-label-sm">Offer Badge Tag</label>
+                                        <input type="text" name="offer_badge" class="form-control form-control-sm" placeholder="e.g. 20% OFF / Summer Deal" value="{{ old('offer_badge') }}">
+                                    </div>
+                                    <!-- Discount Value -->
+                                    <div class="col-6 col-md-4">
+                                        <label class="info-label-sm">Discount Percent (%)</label>
+                                        <input type="number" min="0" max="100" name="discount_percent" class="form-control form-control-sm" placeholder="e.g. 20" value="{{ old('discount_percent', '0') }}">
+                                    </div>
+                                    <!-- Coupon Code -->
+                                    <div class="col-6 col-md-4">
+                                        <label class="info-label-sm">Auto Coupon Code</label>
+                                        <input type="text" name="coupon_code" class="form-control form-control-sm text-uppercase fw-bold text-success" placeholder="e.g. OFFER20" value="{{ old('coupon_code') }}">
+                                    </div>
+                                </div>
+
                                 <div class="row g-2">
                                     <!-- Validity Start Date -->
                                     <div class="col-6 col-md-3">

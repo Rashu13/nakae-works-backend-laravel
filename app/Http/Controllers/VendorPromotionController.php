@@ -64,16 +64,20 @@ class VendorPromotionController extends Controller
         }
 
         VendorPromotionModel::create([
-            'vendor_id'       => $request->vendor_id,
-            'sub_category_id' => $request->sub_category_id,
+            'vendor_id'        => $request->vendor_id,
+            'sub_category_id'  => $request->sub_category_id,
             'city_id'          => $request->city_id,
-            'title'           => $request->title,
-            'banner_image'    => $imagePath,
-            'placement'       => $request->placement,
-            'start_date'      => $request->start_date,
-            'end_date'        => $request->end_date,
-            'price'           => $request->price,
-            'status'          => $request->status ?? 1,
+            'title'            => $request->title,
+            'banner_image'     => $imagePath,
+            'placement'        => $request->placement,
+            'coupon_code'      => $request->coupon_code ? strtoupper(trim($request->coupon_code)) : null,
+            'discount_percent' => $request->discount_percent ?? 0,
+            'discount_amount'  => $request->discount_amount ?? 0.00,
+            'offer_badge'      => $request->offer_badge,
+            'start_date'       => $request->start_date,
+            'end_date'         => $request->end_date,
+            'price'            => $request->price,
+            'status'           => $request->status ?? 1,
         ]);
 
         return redirect()->back()->with('success', 'Vendor Ad / Promoted Listing created successfully.');
