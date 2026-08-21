@@ -817,4 +817,48 @@ class VendorController extends Controller
             ], 500);
         }
     }
+
+    public function createPromotion(Request $request)
+    {
+        $vendor = auth('vendor')->user();
+        if (!$vendor) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $request->validate([
+            'title'        => 'required|string|max:255',
+            'placement'    => 'required|in:home_banner,category_top,city_featured',
+            'start_date'   => 'nullable|date',
+            'end_date'     => 'nullable|date|after_or_equal:start_date',
+            'banner_image' => 'nullable|image|max:4096',
+        ]);
+
+        $imagePath = null;
+        if ($request->hasFile('banner_image')) {
+            $file = $request->file('banner_image');
+            $filename = 'ad_' . time() . '_' . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/banner_images'), $filename);
+            $imagePath = 'uploads/banner_images/' . $filename;
+        }
+
+        $promo = \App\Models\VendorPromotionModel::create([
+            'vendor_id'       => $vendor->id,
+            'sub_category_id' => $request->sub_category_id,
+            'city_id'          => $request->city_id ?? $vendor->city_id,
+            'title'           => $request->title,
+            'banner_image'    => $imagePath,
+            'placement'       => $request->placement,
+            'start_date'      => $request->start_date ?? now()->toDateString(),
+            'end_date'        => $request->end_date ?? now()->addDays(30)->toDateString(),
+            'price'           => $request->price ?? 0,
+            'status'          => 1,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Vendor Ad / Promotion submitted successfully.',
+            'data'    => $promo
+        ], 201);
+    }
 }
+

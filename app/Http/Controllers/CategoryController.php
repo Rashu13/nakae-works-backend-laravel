@@ -158,7 +158,6 @@ class CategoryController extends Controller
     }
 
     // Store Sub Category
-    // Store Sub Category
     public function storeSubCategory(Request $request)
     {
         $request->validate([
@@ -171,7 +170,8 @@ class CategoryController extends Controller
                 }),
             ],
 
-            'icon' => 'required|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
+            'desc'   => 'nullable|string',
+            'icon'   => 'required|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
             'status' => 'required|in:0,1',
         ]);
 
@@ -193,9 +193,13 @@ class CategoryController extends Controller
             $icon->move($targetPath, $iconName);
         }
 
+        $desc = $request->desc ?? $request->description;
+
         SubCategoryModel::create([
             'category_id'          => $request->category_id,
             'sub_category_name'    => $request->sub_category_name,
+            'desc'                 => $desc,
+            'description'          => $desc,
             'icon'                 => 'uploads/category_images/' . $iconName,
             'base_price'           => $request->base_price ?? 0.00,
             'visiting_fee'         => $request->visiting_fee ?? 0.00,
@@ -237,7 +241,8 @@ class CategoryController extends Controller
                     ->ignore($subcategory->id),
             ],
 
-            'icon' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
+            'desc'   => 'nullable|string',
+            'icon'   => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
             'status' => 'required|in:0,1',
         ]);
 
@@ -259,8 +264,12 @@ class CategoryController extends Controller
             $subcategory->icon = 'uploads/category_images/' . $iconName;
         }
 
+        $desc = $request->desc ?? $request->description;
+
         $subcategory->category_id          = $request->category_id;
         $subcategory->sub_category_name    = $request->sub_category_name;
+        $subcategory->desc                 = $desc;
+        $subcategory->description          = $desc;
         $subcategory->base_price           = $request->base_price ?? 0.00;
         $subcategory->visiting_fee         = $request->visiting_fee ?? 0.00;
         $subcategory->tax_rate             = $request->tax_rate ?? 18.00;

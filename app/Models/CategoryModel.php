@@ -9,7 +9,7 @@ class CategoryModel extends Model
 {
     use HasFactory;
     protected $table = 'categories';
-    protected $fillable = ['category_name', 'category_icon', 'category_image', 'sort_order','in_home', 'status'];
+    protected $fillable = ['category_name', 'name', 'slug', 'category_icon', 'category_image', 'image', 'sort_order', 'in_home', 'status'];
 
     // One Category -> Many Sub Categories
     public function subCategories()

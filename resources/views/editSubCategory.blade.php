@@ -149,6 +149,18 @@
                                 </div>
                             @endif
                         </div>
+
+                        <!-- Description (Desc) -->
+                        <div class="col-12 mt-2">
+                            <label class="info-label-sm">Description (Desc)</label>
+                            <textarea name="desc"
+                                      rows="3"
+                                      class="form-control @error('desc') is-invalid @enderror"
+                                      placeholder="Enter service / sub category description, features, or inclusions...">{{ old('desc', $subCate->desc ?? $subCate->description) }}</textarea>
+                            @error('desc')
+                                <div class="text-danger small mt-1" style="font-size: 0.7rem;">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
                     <!-- 2. RATES & TAXES -->

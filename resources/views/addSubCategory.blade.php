@@ -184,6 +184,11 @@
                                     <td>
                                         <span class="fw-bold text-dark d-block">{{ $sub->sub_category_name }}</span>
                                         <span class="text-muted small" style="font-size: 0.68rem;">ID: #{{ $sub->id }}</span>
+                                        @if($sub->desc || $sub->description)
+                                            <div class="text-muted small mt-1" style="font-size: 0.7rem; max-width: 250px;" title="{{ $sub->desc ?? $sub->description }}">
+                                                <i class="mdi mdi-text-box-outline text-primary me-1"></i>{{ \Illuminate\Support\Str::limit($sub->desc ?? $sub->description, 50) }}
+                                            </div>
+                                        @endif
                                     </td>
 
                                     <!-- Rates -->
@@ -338,6 +343,20 @@
                                             <option value="1" selected>Active</option>
                                             <option value="0">Inactive</option>
                                         </select>
+                                    </div>
+
+                                    <!-- Description (Desc) -->
+                                    <div class="col-12">
+                                        <label class="info-label-sm">
+                                            Description (Desc)
+                                        </label>
+                                        <textarea name="desc"
+                                                  rows="3"
+                                                  class="form-control @error('desc') is-invalid @enderror"
+                                                  placeholder="Enter service / sub category description, features, or inclusions...">{{ old('desc') }}</textarea>
+                                        @error('desc')
+                                            <div class="text-danger small mt-1" style="font-size: 0.7rem;">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
 

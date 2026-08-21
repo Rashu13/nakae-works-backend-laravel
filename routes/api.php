@@ -106,6 +106,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('/today-accepted-requests-count', [OrderController::class, 'todayAcceptedRequestsCount']);
 
         Route::post('/update-device-token', [App\Http\Controllers\API\VendorController::class, 'updateDeviceToken']);
-
+        Route::post('/create-promotion', [App\Http\Controllers\API\VendorController::class, 'createPromotion']);
     });
+
 });
