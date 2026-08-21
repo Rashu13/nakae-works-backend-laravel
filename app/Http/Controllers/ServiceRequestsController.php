@@ -110,10 +110,11 @@ class ServiceRequestsController extends Controller
         $fcmToken = $newVendor->device_token ?? $newVendor->fcm_token;
         if ($fcmToken && class_exists(\App\Http\Controllers\BroadcastNotificationController::class)) {
             try {
+                $serviceName = $serviceReq->subCategory ? $serviceReq->subCategory->sub_category_name : 'Service';
                 \App\Http\Controllers\BroadcastNotificationController::sendFcmPushNotification(
                     [$fcmToken],
                     'New Service Booking Assigned',
-                    "You have been assigned booking #{$serviceReq->request_code} ({$serviceReq->subCategory->sub_category_name ?? 'Service'}).",
+                    "You have been assigned booking #{$serviceReq->request_code} ({$serviceName}).",
                     ['request_id' => $serviceReq->id, 'type' => 'booking_assigned']
                 );
             } catch (\Exception $e) {
