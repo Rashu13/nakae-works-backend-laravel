@@ -348,12 +348,13 @@
                                     <!-- Description (Desc) -->
                                     <div class="col-12">
                                         <label class="info-label-sm">
-                                            Description (Desc)
+                                            Service Description (Inclusions, Exclusions, Details)
                                         </label>
                                         <textarea name="desc"
-                                                  rows="3"
+                                                  rows="6"
                                                   class="form-control @error('desc') is-invalid @enderror"
-                                                  placeholder="Enter service / sub category description, features, or inclusions...">{{ old('desc') }}</textarea>
+                                                  style="min-height: 130px; font-size: 0.85rem; line-height: 1.5; resize: vertical;"
+                                                  placeholder="Enter detailed service description, key features, inclusions, warranties, or specific instructions for customers...">{{ old('desc') }}</textarea>
                                         @error('desc')
                                             <div class="text-danger small mt-1" style="font-size: 0.7rem;">{{ $message }}</div>
                                         @enderror
