@@ -84,7 +84,7 @@ class VendorPromotionController extends Controller
 
         $promotions = $query->latest()->paginate(15)->withQueryString();
 
-        $vendors = VendorModel::where('status', 'approved')->orderBy('name')->get();
+        $vendors = VendorModel::with(['services.subCategory'])->where('status', 'approved')->orderBy('name')->get();
         $subCategories = SubCategoryModel::where('status', 1)->orderBy('sub_category_name')->get();
         $cities = CityModel::where('status', 1)->orderBy('city_name')->get();
 

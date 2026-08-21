@@ -421,10 +421,23 @@
                                         <label class="info-label-sm">
                                             Select Vendor <span class="text-danger">*</span>
                                         </label>
-                                        <select name="vendor_id" class="form-select @error('vendor_id') is-invalid @enderror" required>
+                                        <select name="vendor_id" id="promoVendorSelect" class="form-select @error('vendor_id') is-invalid @enderror" required>
                                             <option value="">-- Choose Vendor --</option>
                                             @foreach($vendors as $ven)
-                                                <option value="{{ $ven->id }}" {{ old('vendor_id') == $ven->id ? 'selected' : '' }}>
+                                                @php
+                                                    $assignedServices = $ven->services->map(function($vs){
+                                                        return [
+                                                            'id' => $vs->sub_category_id,
+                                                            'name' => $vs->subCategory->sub_category_name ?? ('Service #' . $vs->sub_category_id)
+                                                        ];
+                                                    })->filter(function($item){
+                                                        return !empty($item['id']);
+                                                    })->values();
+                                                @endphp
+                                                <option value="{{ $ven->id }}" 
+                                                    data-city-id="{{ $ven->city_id }}"
+                                                    data-services="{{ json_encode($assignedServices) }}"
+                                                    {{ old('vendor_id') == $ven->id ? 'selected' : '' }}>
                                                     {{ $ven->name }} ({{ $ven->vendor_code }}) - {{ $ven->phone }}
                                                 </option>
                                             @endforeach
@@ -464,9 +477,12 @@
                                 <div class="row g-2 mb-2">
                                     <!-- Target Service (Sub-Category) -->
                                     <div class="col-12 col-md-6">
-                                        <label class="info-label-sm">Target Service / Sub-Category (Optional)</label>
-                                        <select name="sub_category_id" class="form-select">
-                                            <option value="">-- All Services --</option>
+                                        <label class="info-label-sm d-flex justify-content-between">
+                                            <span>Target Service / Sub-Category</span>
+                                            <span id="promoServiceCountBadge" class="badge bg-primary-subtle text-primary py-0" style="font-size: 0.65rem;">Select Vendor First</span>
+                                        </label>
+                                        <select name="sub_category_id" id="promoServiceSelect" class="form-select">
+                                            <option value="">-- Select a Vendor First --</option>
                                             @foreach($subCategories as $sub)
                                                 <option value="{{ $sub->id }}" {{ old('sub_category_id') == $sub->id ? 'selected' : '' }}>
                                                     {{ $sub->sub_category_name }}
@@ -478,7 +494,7 @@
                                     <!-- Target City -->
                                     <div class="col-12 col-md-6">
                                         <label class="info-label-sm">Target City (Optional)</label>
-                                        <select name="city_id" class="form-select">
+                                        <select name="city_id" id="promoCitySelect" class="form-select">
                                             <option value="">-- All Cities --</option>
                                             @foreach($cities as $ct)
                                                 <option value="{{ $ct->id }}" {{ old('city_id') == $ct->id ? 'selected' : '' }}>
@@ -665,6 +681,67 @@
             origInput.addEventListener('input', calculateOffer);
             discVal.addEventListener('input', calculateOffer);
             discType.addEventListener('change', calculateOffer);
+        }
+
+        // Dynamic Vendor-to-Services and City Auto-Filter
+        const vendorSelect = document.getElementById('promoVendorSelect');
+        const serviceSelect = document.getElementById('promoServiceSelect');
+        const citySelect = document.getElementById('promoCitySelect');
+        const countBadge = document.getElementById('promoServiceCountBadge');
+
+        function updateVendorServices() {
+            if (!vendorSelect || !serviceSelect) return;
+            const selectedOpt = vendorSelect.options[vendorSelect.selectedIndex];
+            
+            if (!selectedOpt || !selectedOpt.value) {
+                serviceSelect.innerHTML = '<option value="">-- Select a Vendor First --</option>';
+                if (countBadge) {
+                    countBadge.className = 'badge bg-secondary-subtle text-secondary py-0';
+                    countBadge.textContent = 'Select Vendor First';
+                }
+                return;
+            }
+
+            const rawServices = selectedOpt.getAttribute('data-services');
+            const cityId = selectedOpt.getAttribute('data-city-id');
+
+            // Auto-select city if vendor has one
+            if (cityId && citySelect) {
+                citySelect.value = cityId;
+            }
+
+            let services = [];
+            try {
+                services = JSON.parse(rawServices || '[]');
+            } catch (e) {
+                services = [];
+            }
+
+            if (services && services.length > 0) {
+                let html = '<option value="">-- All Assigned Services (' + services.length + ' Available) --</option>';
+                services.forEach(function(s) {
+                    html += '<option value="' + s.id + '">' + s.name + '</option>';
+                });
+                serviceSelect.innerHTML = html;
+                if (countBadge) {
+                    countBadge.className = 'badge bg-success-subtle text-success py-0';
+                    countBadge.textContent = services.length + ' Services Assigned';
+                }
+            } else {
+                serviceSelect.innerHTML = '<option value="">-- No Specific Services Assigned (General Vendor Promo) --</option>';
+                if (countBadge) {
+                    countBadge.className = 'badge bg-warning-subtle text-warning py-0';
+                    countBadge.textContent = '0 Services Found';
+                }
+            }
+        }
+
+        if (vendorSelect) {
+            vendorSelect.addEventListener('change', updateVendorServices);
+            // Run on initial load if vendor is pre-selected
+            if (vendorSelect.value) {
+                updateVendorServices();
+            }
         }
     });
 </script>
