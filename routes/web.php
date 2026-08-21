@@ -44,6 +44,15 @@ Route::get('/run-migrations', function () {
         'output' => Artisan::output()
     ]);
 });
+
+Route::get('/run-seeders', function () {
+    Artisan::call('db:seed', ['--force' => true]);
+    return response()->json([
+        'success' => true,
+        'message' => 'Database Seeders (Categories & Services) executed successfully on live server!',
+        'output' => Artisan::output()
+    ]);
+});
 Route::get('/privacy-policy', [AdminController::class, 'privacy_policy']);
 Route::get('/terms-and-conditions', [AdminController::class, 'terms']);
 Route::get('/about', [AdminController::class, 'about']);
