@@ -82,6 +82,21 @@
                 </div>
             </div>
 
+            <!-- NOTIFICATIONS -->
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-2 p-2 px-3" style="font-size: 0.8rem;" role="alert">
+                    <i class="mdi mdi-check-circle me-1"></i> <strong>Success!</strong> {{ session('success') }}
+                    <button type="button" class="btn-close p-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-2 p-2 px-3" style="font-size: 0.8rem;" role="alert">
+                    <i class="mdi mdi-alert-circle me-1"></i> <strong>Error!</strong> {{ session('error') }}
+                    <button type="button" class="btn-close p-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <!-- REQUESTS TABLE CARD -->
             <div class="compact-card p-0">
                 <div class="compact-card-header">
@@ -107,7 +122,7 @@
                                 <th>Budget</th>
                                 <th class="text-center">Status</th>
                                 <th>Booking Date</th>
-                                <th style="width: 50px;" class="text-center">View</th>
+                                <th style="width: 75px;" class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -137,9 +152,15 @@
                                     <!-- Vendor -->
                                     <td>
                                         @if($request->vendor)
-                                            <span class="fw-bold text-dark" style="font-size: 0.8rem;"><i class="mdi mdi-account-wrench text-indigo me-1"></i> {{ $request->vendor->name }}</span>
+                                            <span class="fw-bold text-dark d-block" style="font-size: 0.8rem;"><i class="mdi mdi-account-wrench text-indigo me-1"></i> {{ $request->vendor->name }}</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none text-warning fw-semibold" data-bs-toggle="modal" data-bs-target="#reassignModal{{ $request->id }}" style="font-size: 0.68rem;">
+                                                <i class="mdi mdi-account-switch me-1"></i>Reassign
+                                            </button>
                                         @else
-                                            <span class="badge bg-light text-muted border" style="font-size: 0.68rem;">Unassigned</span>
+                                            <span class="badge bg-light text-muted border d-block mb-1" style="font-size: 0.68rem; width: fit-content;">Unassigned</span>
+                                            <button type="button" class="btn btn-xs btn-outline-primary px-2 py-0" data-bs-toggle="modal" data-bs-target="#reassignModal{{ $request->id }}" style="font-size: 0.65rem;">
+                                                <i class="mdi mdi-account-plus me-1"></i>Assign Partner
+                                            </button>
                                         @endif
                                     </td>
 
@@ -182,14 +203,95 @@
                                         {{ $request->created_at->format('d M Y') }}
                                     </td>
 
-                                    <!-- View Action -->
+                                    <!-- Actions -->
                                     <td class="text-center">
-                                        <a href="{{ route('admin.service.requests.view', $request->id) }}"
-                                           class="btn btn-sm btn-outline-info p-0 d-inline-flex align-items-center justify-content-center"
-                                           style="width: 26px; height: 26px;"
-                                           title="View Details">
-                                            <i class="mdi mdi-eye" style="font-size: 0.8rem;"></i>
-                                        </a>
+                                        <div class="d-inline-flex gap-1">
+                                            <!-- Reassign Vendor Button -->
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-warning p-0 d-inline-flex align-items-center justify-content-center"
+                                                    style="width: 26px; height: 26px;"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#reassignModal{{ $request->id }}"
+                                                    title="Transfer / Reassign Vendor">
+                                                <i class="mdi mdi-account-switch" style="font-size: 0.8rem;"></i>
+                                            </button>
+
+                                            <!-- View Details Button -->
+                                            <a href="{{ route('admin.service.requests.view', $request->id) }}"
+                                               class="btn btn-sm btn-outline-info p-0 d-inline-flex align-items-center justify-content-center"
+                                               style="width: 26px; height: 26px;"
+                                               title="View Details">
+                                                <i class="mdi mdi-eye" style="font-size: 0.8rem;"></i>
+                                            </a>
+                                        </div>
+
+                                        <!-- MODAL FOR THIS REQUEST -->
+                                        <div class="modal fade text-start" id="reassignModal{{ $request->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                                                    <div class="modal-header text-white p-3" style="border-top-left-radius: 16px; border-top-right-radius: 16px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+                                                        <h6 class="modal-title fw-bold text-white mb-0">
+                                                            <i class="mdi mdi-account-switch text-warning me-1"></i> Transfer Booking #{{ $request->request_code }}
+                                                        </h6>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('admin.service.requests.reassign', $request->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body p-3">
+                                                            <div class="p-2 mb-3 bg-light rounded-3 border" style="font-size: 0.75rem;">
+                                                                <div class="d-flex justify-content-between mb-1">
+                                                                    <span class="text-muted">Current Vendor:</span>
+                                                                    <span class="fw-bold text-dark">{{ $request->vendor->name ?? 'None (Unassigned)' }}</span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between mb-1">
+                                                                    <span class="text-muted">Category:</span>
+                                                                    <span class="fw-semibold">{{ $request->category->category_name ?? '-' }} ({{ $request->subCategory->sub_category_name ?? '-' }})</span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between">
+                                                                    <span class="text-muted">Customer / Budget:</span>
+                                                                    <span class="fw-semibold text-success">{{ $request->user->name ?? 'Customer' }} | ₹{{ $request->budget }}</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- SELECT NEW VENDOR -->
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold small mb-1" style="font-size: 0.72rem;">Select New Vendor Partner <span class="text-danger">*</span></label>
+                                                                <select name="vendor_id" class="form-select form-select-sm" required>
+                                                                    <option value="">-- Choose New Vendor --</option>
+                                                                    @foreach($vendors as $v)
+                                                                        <option value="{{ $v->id }}" {{ ($request->vendor_id == $v->id) ? 'disabled' : '' }}>
+                                                                            {{ $v->name }} (📞 {{ $v->phone }}) {{ $v->city ? ' - ' . $v->city->name : '' }} {{ ($request->vendor_id == $v->id) ? '[Current]' : '' }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+
+                                                            <!-- STATUS -->
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold small mb-1" style="font-size: 0.72rem;">Status</label>
+                                                                <select name="status" class="form-select form-select-sm">
+                                                                    <option value="Assigned" {{ $request->status == 'Assigned' || $request->status == 'assigned' ? 'selected' : '' }}>Assigned</option>
+                                                                    <option value="Accepted" {{ $request->status == 'Accepted' || $request->status == 'accepted' ? 'selected' : '' }}>Accepted</option>
+                                                                    <option value="Pending" {{ $request->status == 'Pending' || $request->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <!-- REASON -->
+                                                            <div class="mb-2">
+                                                                <label class="form-label fw-bold small mb-1" style="font-size: 0.72rem;">Reason / Admin Remarks (Optional)</label>
+                                                                <textarea name="reason" rows="2" class="form-control form-control-sm" placeholder="e.g. Assigned vendor unavailable at requested slot..."></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer bg-light p-2 px-3 border-top" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                                                            <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-sm btn-warning px-4 text-dark fw-bold">
+                                                                <i class="mdi mdi-check-circle me-1"></i> Confirm Transfer
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
