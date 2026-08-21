@@ -426,9 +426,12 @@
                                             @foreach($vendors as $ven)
                                                 @php
                                                     $assignedServices = $ven->services->map(function($vs){
+                                                        $sub = $vs->subCategory;
+                                                        $price = $sub ? ($sub->price ?: ($sub->base_price ?: 0)) : 0;
                                                         return [
                                                             'id' => $vs->sub_category_id,
-                                                            'name' => $vs->subCategory->sub_category_name ?? ('Service #' . $vs->sub_category_id)
+                                                            'name' => $sub->sub_category_name ?? ('Service #' . $vs->sub_category_id),
+                                                            'price' => (float)$price,
                                                         ];
                                                     })->filter(function($item){
                                                         return !empty($item['id']);
@@ -484,8 +487,11 @@
                                         <select name="sub_category_id" id="promoServiceSelect" class="form-select">
                                             <option value="">-- Select a Vendor First --</option>
                                             @foreach($subCategories as $sub)
-                                                <option value="{{ $sub->id }}" {{ old('sub_category_id') == $sub->id ? 'selected' : '' }}>
-                                                    {{ $sub->sub_category_name }}
+                                                @php
+                                                    $subPrice = (float)($sub->price ?: ($sub->base_price ?: 0));
+                                                @endphp
+                                                <option value="{{ $sub->id }}" data-price="{{ $subPrice }}" {{ old('sub_category_id') == $sub->id ? 'selected' : '' }}>
+                                                    {{ $sub->sub_category_name }} {{ $subPrice > 0 ? '(₹' . number_format($subPrice, 0) . ')' : '' }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -720,7 +726,9 @@
             if (services && services.length > 0) {
                 let html = '<option value="">-- All Assigned Services (' + services.length + ' Available) --</option>';
                 services.forEach(function(s) {
-                    html += '<option value="' + s.id + '">' + s.name + '</option>';
+                    const prc = parseFloat(s.price) || 0;
+                    const prcLabel = prc > 0 ? ' (₹' + prc.toFixed(0) + ')' : '';
+                    html += '<option value="' + s.id + '" data-price="' + prc + '">' + s.name + prcLabel + '</option>';
                 });
                 serviceSelect.innerHTML = html;
                 if (countBadge) {
@@ -734,6 +742,22 @@
                     countBadge.textContent = '0 Services Found';
                 }
             }
+        }
+
+        function onServiceChange() {
+            if (!serviceSelect || !origInput) return;
+            const opt = serviceSelect.options[serviceSelect.selectedIndex];
+            if (opt) {
+                const prc = parseFloat(opt.getAttribute('data-price')) || 0;
+                if (prc > 0) {
+                    origInput.value = prc.toFixed(2);
+                    calculateOffer();
+                }
+            }
+        }
+
+        if (serviceSelect) {
+            serviceSelect.addEventListener('change', onServiceChange);
         }
 
         if (vendorSelect) {
