@@ -685,26 +685,52 @@
         }
     }
 
-    $('#state_id').change(function() {
-        let state_id = $(this).val();
-        $('#city_id').html('<option value="">Loading...</option>');
+    function loadCitiesForState(state_id, selectedCityId) {
+        var citySelect = document.getElementById('city_id');
+        if (!citySelect) return;
 
-        if (state_id) {
-            $.get("{{ url('/admin/city-by-state') }}/" + state_id, function(res) {
-                $('#city_id').html('<option value="">Select City</option>');
+        if (!state_id) {
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            return;
+        }
+
+        citySelect.innerHTML = '<option value="">Loading...</option>';
+
+        fetch("{{ url('/admin/city-by-state') }}/" + state_id)
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+                citySelect.innerHTML = '<option value="">Select City</option>';
                 if (res.success && res.data) {
-                    $.each(res.data, function(i, row) {
-                        $('#city_id').append(
-                            `<option value="${row.id}">${row.city_name}</option>`
-                        );
+                    res.data.forEach(function(row) {
+                        var opt = document.createElement('option');
+                        opt.value = row.id;
+                        opt.textContent = row.city_name;
+                        if (String(row.id) === String(selectedCityId)) {
+                            opt.selected = true;
+                        }
+                        citySelect.appendChild(opt);
                     });
                 }
-            }).fail(function(xhr) {
-                console.error('Failed to load cities', xhr);
-                $('#city_id').html('<option value="">Select City</option>');
+            })
+            .catch(function(err) {
+                console.error("City load error:", err);
+                citySelect.innerHTML = '<option value="">Select City</option>';
             });
-        } else {
-            $('#city_id').html('<option value="">Select City</option>');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var stateSelect = document.getElementById('state_id');
+        var citySelect = document.getElementById('city_id');
+        var selectedCityId = "{{ old('city_id') }}";
+
+        if (stateSelect) {
+            stateSelect.addEventListener('change', function() {
+                loadCitiesForState(this.value, selectedCityId);
+            });
+
+            if (stateSelect.value && (!citySelect.options || citySelect.options.length <= 1)) {
+                loadCitiesForState(stateSelect.value, selectedCityId);
+            }
         }
     });
 </script>

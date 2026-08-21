@@ -369,6 +369,13 @@
                                     <label>City</label>
                                     <select class="form-select @error('city_id') is-invalid @enderror" name="city_id" id="city_id">
                                         <option value="">Select City</option>
+                                        @if(isset($cities))
+                                            @foreach($cities as $c)
+                                                <option value="{{ $c->id }}" {{ (string)old('city_id', $vendor->city_id) === (string)$c->id ? 'selected' : '' }}>
+                                                    {{ $c->city_name }}
+                                                </option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                     @error('city_id')
                                     <div class="text-danger">{{ $message }}</div>
@@ -689,37 +696,53 @@
         }
     }
 
-    $(document).ready(function() {
-        // Store selected city id to auto-select on page load
-        let selectedCityId = "{{ old('city_id', $vendor->city_id) }}";
+    function loadCitiesForState(state_id, selectedCityId) {
+        var citySelect = document.getElementById('city_id');
+        if (!citySelect) return;
 
-        $('#state_id').change(function() {
-            let state_id = $(this).val();
-            $('#city_id').html('<option value="">Loading...</option>');
+        if (!state_id) {
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            return;
+        }
 
-            if (state_id) {
-                $.get("{{ url('/admin/city-by-state') }}/" + state_id, function(res) {
-                    $('#city_id').html('<option value="">Select City</option>');
-                    if (res.success && res.data) {
-                        $.each(res.data, function(i, row) {
-                            let isSelected = (row.id == selectedCityId) ? 'selected' : '';
-                            $('#city_id').append(
-                                `<option value="${row.id}" ${isSelected}>${row.city_name}</option>`
-                            );
-                        });
-                    }
-                }).fail(function(xhr) {
-                    console.error('Failed to load cities for state ' + state_id, xhr);
-                    $('#city_id').html('<option value="">Select City</option>');
-                });
-            } else {
-                $('#city_id').html('<option value="">Select City</option>');
+        citySelect.innerHTML = '<option value="">Loading...</option>';
+
+        fetch("{{ url('/admin/city-by-state') }}/" + state_id)
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+                citySelect.innerHTML = '<option value="">Select City</option>';
+                if (res.success && res.data) {
+                    res.data.forEach(function(row) {
+                        var opt = document.createElement('option');
+                        opt.value = row.id;
+                        opt.textContent = row.city_name;
+                        if (String(row.id) === String(selectedCityId)) {
+                            opt.selected = true;
+                        }
+                        citySelect.appendChild(opt);
+                    });
+                }
+            })
+            .catch(function(err) {
+                console.error("City load error:", err);
+                citySelect.innerHTML = '<option value="">Select City</option>';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var stateSelect = document.getElementById('state_id');
+        var citySelect = document.getElementById('city_id');
+        var selectedCityId = "{{ old('city_id', $vendor->city_id ?? '') }}";
+
+        if (stateSelect) {
+            stateSelect.addEventListener('change', function() {
+                loadCitiesForState(this.value, selectedCityId);
+            });
+
+            // If state is selected but city options are empty or not populated
+            if (stateSelect.value && (!citySelect.options || citySelect.options.length <= 1)) {
+                loadCitiesForState(stateSelect.value, selectedCityId);
             }
-        });
-
-        // Trigger the state change on load to populate existing city
-        if ($('#state_id').val() !== '') {
-            $('#state_id').trigger('change');
         }
     });
 </script>

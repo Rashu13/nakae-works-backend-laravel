@@ -214,7 +214,8 @@ class VendorController extends Controller
             ->orderBy('category_name')
             ->get();
         $vendor = VendorModel::with(['services'])->findOrFail($id);
-        return view('editVendor', compact('vendor', 'states', 'categories'));
+        $cities = $vendor->state_id ? CityModel::where('state_id', $vendor->state_id)->orderBy('city_name')->get() : collect();
+        return view('editVendor', compact('vendor', 'states', 'categories', 'cities'));
     }
     public function editVendorPost(Request $request, $id)
     {
