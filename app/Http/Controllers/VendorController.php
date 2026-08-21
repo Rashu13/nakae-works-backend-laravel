@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoryModel;
 use App\Models\StateModel;
+use App\Models\CityModel;
 use App\Models\VendorModel;
 use Illuminate\Http\Request;
 use App\Models\VendorServiceModel;
