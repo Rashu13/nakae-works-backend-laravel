@@ -55,8 +55,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/notification-view/{id}', [BookingController::class, 'notificationView']);
 
 
+    Route::post('/add-review', [ReviewController::class, 'add_review']);
     Route::post('/add-review/{id}', [ReviewController::class, 'add_review']);
     Route::post('/edit-review/{id}', [ReviewController::class, 'edit_review']);
+
     Route::get('/review-details/{id}', [ReviewController::class, 'review_details']);
     Route::get('/my-reviews', [ReviewController::class, 'my_reviews']);
     Route::get('/delete-review/{id}', [ReviewController::class, 'delete_review']);
