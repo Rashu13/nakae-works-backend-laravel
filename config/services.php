@@ -31,4 +31,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'infrainfotech' => [
+        'url'         => env('INFRAINFOTECH_SMS_URL', 'https://sms.infrainfotech.com/sms-panel/api/http/index.php'),
+        'username'    => env('INFRAINFOTECH_SMS_USERNAME', 'Starnext'),
+        'apikey'      => env('INFRAINFOTECH_SMS_APIKEY', 'EB98B-9C93C'),
+        'sender'      => env('INFRAINFOTECH_SMS_SENDER', 'ROHIAL'),
+        'template_id' => env('INFRAINFOTECH_SMS_TEMPLATE_ID', '1507165087189012738'),
+        'route'       => env('INFRAINFOTECH_SMS_ROUTE', 'DND'),
+    ],
+
 ];
+

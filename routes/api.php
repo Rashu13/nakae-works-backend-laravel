@@ -5,6 +5,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\OtpController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/login-get', [UserController::class, 'login_page'])->name('login');
 Route::post('/login', [UserController::class, 'login'])->name('login.post');
 Route::post('/register', [UserController::class, 'register']);
+
+/*
+|--------------------------------------------------------------------------
+| Customer OTP Routes
+|--------------------------------------------------------------------------
+*/
+Route::post('/send-otp', [OtpController::class, 'sendOtp']);
+Route::post('/verify-otp', [OtpController::class, 'verifyOtp']);
+Route::post('/login-with-otp', [OtpController::class, 'loginWithOtp']);
+Route::post('/register-with-otp', [OtpController::class, 'registerWithOtp']);
+
 
 Route::middleware('auth:api')->group(function () {
 
@@ -62,9 +74,14 @@ Route::prefix('vendor')->group(function () {
 
     Route::post('/login', [App\Http\Controllers\API\VendorController::class, 'login']);
     Route::post('/register', [App\Http\Controllers\API\VendorController::class, 'register']);
+    Route::post('/send-otp', [OtpController::class, 'sendVendorOtp']);
+    Route::post('/verify-otp', [OtpController::class, 'verifyVendorOtp']);
+    Route::post('/login-with-otp', [OtpController::class, 'loginVendorWithOtp']);
+    Route::post('/register-with-otp', [OtpController::class, 'registerVendorWithOtp']);
     Route::get('/reviews-by-subcategory/{subCategory}/{vendorID}', [App\Http\Controllers\API\VendorController::class, 'reviewsBySubCatgory']);
     Route::get('/reviews-by-vendor/{vendorID}', [App\Http\Controllers\API\VendorController::class, 'reviewsByVendor']);
     Route::get('/reviews-by-vendor-avg/{vendorID}', [App\Http\Controllers\API\VendorController::class, 'reviewsByAvg']);
+
 
     Route::middleware('auth:vendor')->group(function () {
 
