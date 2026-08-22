@@ -15,13 +15,13 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 class OtpController extends Controller
 {
     /**
-     * Generate & Send OTP to Mobile Number via SMS Gateway
+     * Generate & Send OTP to Mobile Number via SMS Gateway (Customer)
      */
     public function sendOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'phone'  => 'required|numeric|digits_between:10,12',
-            'type'   => 'nullable|string|in:login,register,login_register',
+            'phone' => 'required|numeric|digits_between:10,12',
+            'type'  => 'nullable|string|in:login,register,login_register',
         ]);
 
         if ($validator->fails()) {
@@ -37,6 +37,20 @@ class OtpController extends Controller
             $phone = substr($phone, -10);
         }
 
+        $type = $request->type ?? 'login_register';
+
+        // Check if user exists for login type
+        if ($type === 'login') {
+            $userExists = User::where('phone', $phone)->exists();
+            if (!$userExists) {
+                return response()->json([
+                    'success'       => false,
+                    'is_registered' => false,
+                    'message'       => 'Mobile number ' . $phone . ' is not registered. Please sign up first.'
+                ], 404);
+            }
+        }
+
         // Generate 4-digit random numeric OTP
         $otp = (string) rand(1000, 9999);
 
@@ -48,7 +62,7 @@ class OtpController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'OTP sent successfully to mobile number',
+            'message' => 'OTP sent successfully to ' . $phone,
             'phone'   => $phone,
         ], 200);
     }
@@ -123,6 +137,18 @@ class OtpController extends Controller
             $phone = substr($phone, -10);
         }
 
+        // Search user by phone number first
+        $user = User::where('phone', $phone)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success'       => false,
+                'is_registered' => false,
+                'message'       => 'Mobile number ' . $phone . ' is not registered in user table. Please sign up first.',
+                'phone'         => $phone
+            ], 404);
+        }
+
         $inputOtp  = trim($request->otp);
         $cachedOtp = Cache::get('otp_' . $phone);
 
@@ -138,18 +164,6 @@ class OtpController extends Controller
                 'success' => false,
                 'message' => 'Invalid OTP code.'
             ], 400);
-        }
-
-        // Search user by phone number
-        $user = User::where('phone', $phone)->first();
-
-        if (!$user) {
-            return response()->json([
-                'success'       => true,
-                'is_registered' => false,
-                'message'       => 'OTP verified successfully, but no account found for this phone number. Please complete registration.',
-                'phone'         => $phone
-            ], 200);
         }
 
         // Clear OTP Cache upon successful verification
@@ -240,7 +254,48 @@ class OtpController extends Controller
      */
     public function sendVendorOtp(Request $request)
     {
-        return $this->sendOtp($request);
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|numeric|digits_between:10,12',
+            'type'  => 'nullable|string|in:login,register,login_register',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $phone = preg_replace('/[^0-9]/', '', $request->phone);
+        if (strlen($phone) > 10) {
+            $phone = substr($phone, -10);
+        }
+
+        $type = $request->type ?? 'login_register';
+
+        // Check if vendor exists for login type
+        if ($type === 'login') {
+            $vendorExists = VendorModel::where('phone', $phone)->exists();
+            if (!$vendorExists) {
+                return response()->json([
+                    'success'       => false,
+                    'is_registered' => false,
+                    'message'       => 'Vendor mobile number ' . $phone . ' is not registered. Please sign up first.'
+                ], 404);
+            }
+        }
+
+        $otp = (string) rand(1000, 9999);
+        Cache::put('otp_' . $phone, $otp, 600);
+
+        SmsService::sendOtp($phone, $otp);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP sent successfully to ' . $phone,
+            'phone'   => $phone,
+        ], 200);
     }
 
     /**
@@ -274,6 +329,17 @@ class OtpController extends Controller
             $phone = substr($phone, -10);
         }
 
+        $vendor = VendorModel::where('phone', $phone)->first();
+
+        if (!$vendor) {
+            return response()->json([
+                'success'       => false,
+                'is_registered' => false,
+                'message'       => 'Vendor mobile number ' . $phone . ' is not registered. Please complete registration.',
+                'phone'         => $phone
+            ], 404);
+        }
+
         $inputOtp  = trim($request->otp);
         $cachedOtp = Cache::get('otp_' . $phone);
 
@@ -289,17 +355,6 @@ class OtpController extends Controller
                 'success' => false,
                 'message' => 'Invalid OTP code.'
             ], 400);
-        }
-
-        $vendor = VendorModel::where('phone', $phone)->first();
-
-        if (!$vendor) {
-            return response()->json([
-                'success'       => true,
-                'is_registered' => false,
-                'message'       => 'OTP verified successfully, but no vendor account found for this phone number. Please complete registration.',
-                'phone'         => $phone
-            ], 200);
         }
 
         Cache::forget('otp_' . $phone);
